@@ -1,4 +1,4 @@
-from solve_with_QR import *
+from QR_functions import *
 
 n, m = map(int, input().strip().split(" "))
 
