@@ -53,19 +53,19 @@ def var(vector: list) -> float:
     Returns:
         float: variance
     """
-    mean_value = mean(vector)
+    E = mean(vector)
     var = []
-    for item in vector:
-        var.append((item - mean_value)**2)
+    for x in vector:
+        var.append((x - E)**2)
     return mean(var)
 
 def std(vector: list) -> float:
-    """Return Standart Deviation of vector
+    """Return Standard Deviation of vector
 
     ------
     INFO:
     ------
-    The standart deviation is the same as a variance,
+    The standard deviation is the same as a variance,
     but here, to get STD, we calculate the square root
     of the variance, to get rid of squaring in VAR function.
 
@@ -84,4 +84,23 @@ def std(vector: list) -> float:
         float: standart deviation value
     """
     return var(vector)**0.5
+
+def standard_error(vector: list) -> float:
+    sd = std(vector)
+    root_NO = len(vector)**0.5
+    return sd / root_NO
+
+
+def t_value(popmean: float, samplemean: float, sd: float, no: int) -> float:
+    se = sd / no**0.5
+    z = (popmean - samplemean) / se
+    return z
+
+def paired_ttest_simp(m1: float, m2: float, sd1: float, sd2: float, n1: int, n2: int) -> float:
+    se1 = sd1**2 / n1
+    se2 = sd2**2 / n2
+
+    t = (m1 - m2) / (se1 + se2)**0.5
+
+    return t
 
