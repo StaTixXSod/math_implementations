@@ -92,6 +92,8 @@ def minor(A: list, i: int, j: int):
     -----
     INFO:
     -----
+    You can think about the minor, like this the determinant of cropped matrix A.
+    
     The minor of matrix A, is the same matrix 
     except specified "i" row and "j" column indices. We just get rid of that values.
     Then the determinant of that matrix M is calculated to get Minor value (not in that function).
@@ -253,7 +255,8 @@ def inverse(A: list):
 
     2. Find Minor matrix
 
-    3. Switch signs in Minor specific indices
+    3. Switch signs in Minor specific indices.
+    To calculate the sign use the formula: (-1)^(row_idx + col_idx)
 
     4. Transpose Minor matrix
 
@@ -265,12 +268,22 @@ def inverse(A: list):
     Returns:
         list: Inverse matrix
     """
-    result = [[0] * len(A) for _ in range(len(A))]
-    for i in range(len(A)):
-        for j in range(len(A[0])):
-            mi = minor(A, i, j)
-            if i + j % 2 == 1:
-                result[i][j] = -1 * det(mi) / det(A)
-            else:
-                result[i][j] = 1 * det(mi) / det(A)
+    n, m = len(A), len(A[0])
+    result = [[0] * m for _ in range(n)]
+    sign = 1
+    D = det(A)
+
+    assert D != 0
+
+    for i in range(n):
+        for j in range(m):
+            mi = det(minor(A, i, j))
+            sign = (-1)**(i+j)
+            result[i][j] = sign * (1 / D) * mi
+
     return result
+
+def print_matrix(A):
+    for i in A:
+        print('\t'.join(map(str, [round(n, 4) for n in i])))
+    print()
