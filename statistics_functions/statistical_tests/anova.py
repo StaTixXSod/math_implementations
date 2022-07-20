@@ -52,7 +52,6 @@ def one_way_anova(*args) -> float:
     Args:
     sample_1, sample_2, ... ,sample_n: (list) Samples of data to compare
     """
-    dfn = len(flatten(args))
     ssw, df_ssw = SSW(args)
     ssb, df_ssb = SSB(args)
 
