@@ -311,7 +311,7 @@ def get_matrix_coefficients(Q, R, b):
 
     print_matrix(R_inverse, title="Inverse R matrix:")
     I = matmul(R, R_inverse)
-    print_matrix(I, title="R@R.T = I matrix:")
+    print_matrix(I, title="R@R-1 = I matrix:")
 
     RC = matmul(R_inverse, C)
     RC = transpose(RC)[0]
