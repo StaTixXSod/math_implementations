@@ -93,7 +93,7 @@ def minor(A: list, i: int, j: int):
     INFO:
     -----
     You can think about the minor, like this the determinant of cropped matrix A.
-    
+
     The minor of matrix A, is the same matrix 
     except specified "i" row and "j" column indices. We just get rid of that values.
     Then the determinant of that matrix M is calculated to get Minor value (not in that function).
@@ -283,7 +283,8 @@ def inverse(A: list):
 
     return result
 
-def print_matrix(A):
+def print_matrix(A, title: str = ""):
+    print(title)
     for i in A:
         print('\t'.join(map(str, [round(n, 4) for n in i])))
     print()
