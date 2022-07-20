@@ -1,3 +1,11 @@
+import os
+import sys
+
+from QR_functions import normalize_matrix
+
+sys.path.append(os.getcwd())
+from linalg.functions import *
+
 def mul(a, b):
     res = 0
     for i in range(len(a)):
@@ -33,8 +41,18 @@ for i in range(n):
 
 e, trans = ortonorm(e)
 print(e)
-x = [0] * m
-for i in range(m):
-    for j in range(m):
-        x[j] += mul(e[i], a) / mul(e[i], e[i]) * trans[i][j]
-print(*x)
+e = normalize_matrix(transpose(e))
+e = transpose(e)
+print(e)
+# x = [0] * m
+# for i in range(m):
+#     for j in range(m):
+#         x[j] += mul(e[i], a) / mul(e[i], e[i]) * trans[i][j]
+# print(*x)
+
+r_inv = inverse(trans)
+b = transpose(list([a]))
+C = matmul(transpose(e), b)
+x = matmul(r_inv, C)
+
+print(x)
