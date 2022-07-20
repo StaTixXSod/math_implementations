@@ -10,23 +10,23 @@ def one_sample_ttest(v1, v2) -> float:
 
     INFO:
     -----
-    This test compare the population and sample data. 
+    This test compare the population and the sample data. 
     Usually use, when we have general data and we want to know, 
-    if our sample data belongs to general data.
+    if our sample mean belongs to general mean.
 
     This test shows, how far our sample mean (X) deviates from 
     the population data mean (M).
 
     FORMULA:
     --------
-    t = (M - X) / (SE)
+    >>> t = (M - X) / (SE)
         where:
-        M: population mean
-        X: sample mean
-        SE: Standard Error of sample data
+            M: population mean
+            X: sample mean
+            SE: Standard Error of sample data
 
     Here we use SE of sample data, because usually we can't 
-    calculate SE of population data, because we don't know the STD of population data.
+    calculate SE for population data, because we don't know the STD of population data.
 
     Args:
         population (list): population data
@@ -77,7 +77,7 @@ def paired_ttest(v1: list, v2: list) -> float:
     1. To use T Test, it is better that variance from this 2 samples
     were approximately the same (dispersion homogeneity requirement). 
     To check this requirement use "Levene test" or "Fisher criterion".
-    2. If NO of sample data is not really big (NO < 30), this is very important
+    2. If NO (number of observations) of sample data is not really big (NO < 30), this is very important
     to have normal distribution of sample data. If NO > 30, this criterion is fine
     even without normal distribution. (But it's steel better to have normal distribution)
 
