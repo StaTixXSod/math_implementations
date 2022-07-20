@@ -50,6 +50,9 @@ def solve_linear_equation_QR(matrix) -> list:
     A, b = split_by_vectors(matrix)
     Q, R = QR_decomposition(A)
 
+    print_matrix(Q, title="Q matrix:")
+    print_matrix(R, title="R matrix:")
+
     coeffs = get_matrix_coefficients(Q, R, b)
     return coeffs
 
@@ -85,7 +88,6 @@ def QR_decomposition(A):
 
     Q = transpose(Q) # Return Q back to original size
     A = transpose(A) # Return A back to original size
-    
     R = get_R_matrix(Q, A)
 
     return Q, R
@@ -128,7 +130,6 @@ def gram_schmidt_orthonormalization(A):
     """
     U = orthogonalize_matrix(A)
     Q = normalize_matrix(U)
-    print(Q)
     return Q
 
 def orthogonalize_matrix(A):
@@ -307,6 +308,11 @@ def get_matrix_coefficients(Q, R, b):
     C = matmul(Q, b) # Shape (m, 1)
 
     R_inverse = transpose(inverse(R))
+
+    print_matrix(R_inverse, title="Inverse R matrix:")
+    I = matmul(R, R_inverse)
+    print_matrix(I, title="R@R.T = I matrix:")
+
     RC = matmul(R_inverse, C)
     RC = transpose(RC)[0]
     return RC
