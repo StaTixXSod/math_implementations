@@ -184,7 +184,7 @@ def det(A: list) -> float:
 
     The determinant is equal to the sum of the products of the elements of only one row
     by it's minor value. For example we can use only first row of matrix and calculate
-    each row value with its minor value. Then sum it all values together changing 
+    matrix product of each row value with its minor value. Then sum it all together changing 
     the signs in the right places.
 
     >>> | A | = SUM(
