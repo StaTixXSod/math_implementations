@@ -129,7 +129,7 @@ def minor(A: list, i: int, j: int) -> float:
         j (int): specified column index
 
     Returns:
-        list: Minor value
+        float: Minor value
     """
     M = []
     for row_idx in range(len(A)):
@@ -269,6 +269,8 @@ def inverse(A: list):
     """
     n, m = len(A), len(A[0])
 
+    assert n == m
+
     result = [[0] * m for _ in range(n)]
     sign = 1
     D = det(A)
@@ -286,10 +288,15 @@ def inverse(A: list):
             sign = (-1)**(i+j)
             result[i][j] = sign * (1 / D) * mi
 
-    return result
+    return transpose(result)
 
-def print_matrix(A, title: str = ""):
+def print_matrix(A, title: str = "", use_round:int = None):
     print(title)
-    for i in A:
-        print('\t'.join(map(str, [round(n, 4) for n in i])))
-    print()
+    if use_round:
+        for i in A:
+            print('\t'.join(map(str, [round(n, use_round) for n in i])))
+        print()
+    else:
+        for i in A:
+            print('\t'.join(map(str, i)))
+        print()
