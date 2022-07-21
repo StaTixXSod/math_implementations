@@ -1,12 +1,12 @@
-def mul(a: list, b: list):
+def mul(a: list, b: list) -> float:
     """
     Scalar product of vector "a" and vector "b".
 
     FORMULA: 
     --------
-    ( a, b ) = (a1 * b1) + (a2 * b2) + ... + (an * bn)
+    < a, b > = (a1 * b1) + (a2 * b2) + ... + (an * bn)
 
-    where (a, b) - is a scalar product
+    where: < a, b > - is a scalar product
     """
     product = 0
     for ai, bi in zip(a, b):
@@ -52,7 +52,7 @@ def transpose(matrix: list):
     transposed_matrix = [list(i) for i in zip(*matrix)]
     return transposed_matrix
 
-def get_vector_norm(v: list):
+def get_vector_norm(v: list) -> float:
     """
     Return vector norm (length). Denoted as || v ||.
 
@@ -85,18 +85,15 @@ def split_by_vectors(matrix: list):
     y = matrix_by_vector[-1]
     return X, y
 
-def minor(A: list, i: int, j: int):
+def minor(A: list, i: int, j: int) -> float:
     """
-    Return Minor matrix to calculate determinant of that matrix.
+    Return the minor value of matrix A with specified "i" and "j" indices
 
     -----
     INFO:
     -----
-    You can think about the minor, like this the determinant of cropped matrix A.
-
-    The minor of matrix A, is the same matrix 
-    except specified "i" row and "j" column indices. We just get rid of that values.
-    Then the determinant of that matrix M is calculated to get Minor value (not in that function).
+    The minor of matrix A, is the determinant of the same matrix except specified "i" row and "j" column indices. 
+    We simply get rid of the values of the specified row and column, and then calculate the determinant of this matrix M.
 
     --------
     EXAMPLE:
@@ -132,7 +129,7 @@ def minor(A: list, i: int, j: int):
         j (int): specified column index
 
     Returns:
-        list: Minor matrix
+        list: Minor value
     """
     M = []
     for row_idx in range(len(A)):
@@ -143,7 +140,7 @@ def minor(A: list, i: int, j: int):
             for col_idx in range(len(A[0])):
                 if col_idx != j:
                     M[-1].append(A[row_idx][col_idx])
-    return M
+    return det(M)
  
 def det(A: list) -> float:
     """
@@ -185,8 +182,10 @@ def det(A: list) -> float:
 
     * Normal method
 
-    The | A | is equal to sum of products of row elements
-    by it's minor value (for first row for example).
+    The determinant is equal to the sum of the products of the elements of only one row
+    by it's minor value. For example we can use only first row of matrix and calculate
+    each row value with its minor value. Then sum it all values together changing 
+    the signs in the right places.
 
     >>> | A | = SUM(
         (+) A[i][j] * M(A[i][j])
@@ -216,7 +215,7 @@ def det(A: list) -> float:
     determinant = 0
  
     for j in range(n):
-        determinant += A[0][j] * signum * det(minor(A, 0, j))
+        determinant += A[0][j] * signum * minor(A, 0, j)
         signum *= -1
     return determinant
  
@@ -283,7 +282,7 @@ def inverse(A: list):
 
     for i in range(n):
         for j in range(m):
-            mi = det(minor(A, i, j))
+            mi = minor(A, i, j)
             sign = (-1)**(i+j)
             result[i][j] = sign * (1 / D) * mi
 
