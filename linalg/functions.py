@@ -269,11 +269,17 @@ def inverse(A: list):
         list: Inverse matrix
     """
     n, m = len(A), len(A[0])
+
     result = [[0] * m for _ in range(n)]
     sign = 1
     D = det(A)
 
     assert D != 0
+
+    # Check, if there is just one value in vector
+    if m == 1:
+        result[0][0] = 1 / D
+        return result
 
     for i in range(n):
         for j in range(m):
