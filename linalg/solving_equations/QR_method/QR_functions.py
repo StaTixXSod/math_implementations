@@ -50,8 +50,8 @@ def solve_linear_equation_QR(matrix) -> list:
     A, b = split_by_vectors(matrix)
     Q, R = QR_decomposition(A)
 
-    print_matrix(Q, title="Q matrix:")
-    print_matrix(R, title="R matrix:")
+    print_matrix(Q, "Q matrix:", 4)
+    print_matrix(R, "R matrix:", 4)
 
     coeffs = get_matrix_coefficients(Q, R, b)
     return coeffs
@@ -159,7 +159,6 @@ def orthogonalize_matrix(A):
     un = vn - proj_u1(vn) - proj_u2(vn) - ... - proj_un-1(vn)
     """
     m, n = len(A), len(A[0]) # Columns (vectors), Rows (items)
-    # U = [[0]*n for _ in range(m)]
     U = [[] for _ in range(m)]
 
     # First U column will be the same as the A column
@@ -253,7 +252,7 @@ def get_R_matrix(Q, A):
 
 def get_matrix_coefficients(Q, R, b):
     """
-    Return matrix coefficients using Q and R matrices.
+    Return matrix coefficients using QR matrices and answer vector b.
 
     -----
     INFO:
@@ -303,15 +302,14 @@ def get_matrix_coefficients(Q, R, b):
     Returns:
         list: Coefficients list
     """
-    Q = transpose(Q)
     b = transpose(list([b]))
-    C = matmul(Q, b) # Shape (m, 1)
+    C = matmul(transpose(Q), b) # Shape (m, 1)
 
-    R_inverse = transpose(inverse(R))
+    R_inverse = inverse(R)
 
-    print_matrix(R_inverse, title="Inverse R matrix:")
+    print_matrix(R_inverse, "Inverse R matrix:", 4)
     I = matmul(R, R_inverse)
-    print_matrix(I, title="R@R-1 = I matrix:")
+    print_matrix(I, "R@R-1 = I matrix:", 4)
 
     RC = matmul(R_inverse, C)
     RC = transpose(RC)[0]
