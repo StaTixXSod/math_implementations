@@ -73,6 +73,13 @@ def two_sample_ttest(a: list, b: list) -> float:
     This value says, that our difference between 2 sample means deviates 
     from the population mean on "t" sigma value.
 
+    Steps:
+    ------
+    1. Calculate the mean values for a and b samples
+    2. Calculate the STD of a and b samples
+    3. In numerator will be difference between a and b means
+    4. For denominator we have SQRT of SUM of STD^2 divided by their NO
+
     -----
     Args:
         a (list): first independent series data
@@ -150,4 +157,5 @@ def paired_ttest(a: list, b: list) -> float:
     mean_differences = mean(paired_differences)
     SE = standard_error(paired_differences)
     t = mean_differences / SE
+    df = len(paired_differences) - 1
     return t
