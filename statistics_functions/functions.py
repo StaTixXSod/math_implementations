@@ -5,16 +5,14 @@ import matplotlib.pyplot as plt
 def mean(vector: list) -> float:
     """Return the mean value of the vector.
 
-    -----
-    INFO:
+    Info:
     -----
     The mean value is the sum of all values, divided by its length.
     Also, the mean value called as the expected value (E(x)).
 
+    Formula:
     --------
-    FORMULA:
-    --------
-    E(x) = (x1 + x2 + ... + xn) / NO
+    `E(x) = (x1 + x2 + ... + xn) / NO`
 
         where:
             x1...xn: vector values
@@ -35,18 +33,16 @@ def mean(vector: list) -> float:
 def var(vector: list) -> float:
     """Return variance of the vector
 
-    -----
-    INFO:
+    Info:
     -----
     The variance shows, how much values in vector deviates from its mean value in average.
     The deviation can be positive or negative. Because of that, to transform negative values to positive use squaring.
 
     Lower the variance, the closer the values are to each other.
 
+    Formula:
     --------
-    FORMULA:
-    --------
-    VAR(x) = E((x - E(x))^2)
+    `VAR(x) = E((x - E(x))^2)`
         
         where
             E(x): mean value of x vector
@@ -67,19 +63,17 @@ def var(vector: list) -> float:
 def std(vector: list) -> float:
     """Return Standard Deviation of vector
 
-    ------
-    INFO:
-    ------
+    Info:
+    -----
     The standard deviation is the same as a variance,
     but here, to get STD, we calculate the square root
     of the variance, to get rid of squaring in VAR function.
 
     Denoted as the sigma symbol.
 
-    --------
-    FORMULA:
+    Formula:
     --------  
-    STD(x) = SQRT(VAR(x))
+    `STD(x) = SQRT(VAR(x))`
 
     -----
     Args:
@@ -93,14 +87,15 @@ def std(vector: list) -> float:
 def standard_error(vector: list) -> float:
     """Return the standard error of the vector
 
-    FORMULA:
+    Formula:
     --------
-    SE = STD / SD
+    `SE = STD / SD`
         where:
         STD: Standard deviation,
-        SD: Sampling distribution ( SQRT(NO) )
+        SD: Sampling distribution ( `SQRT(NO)` )
         NO: Number of observations
-
+    
+    -----
     Args:
         vector (list): Array
 
@@ -127,11 +122,12 @@ def paired_ttest_simp(m1: float, m2: float, sd1: float, sd2: float, n1: int, n2:
 def percentile(v: list, percent: float) -> float:
     """Return the percentile value of an array
 
-    NOTE:
+    Note:
     -----
     - Percentile of an array = 0.5 is the median.
     - Percentile of an array = 1.0 is the CDF (Cummulative Distribution Function).
-
+    
+    -----
     Args:
         v (list): Array
         percent (float): percentage value from 0 to 1
@@ -168,7 +164,7 @@ def qqplot(vector: list):
 
     The Q-Q plot is better to use, when we have not too much data.
 
-    INTERPRETATION:
+    Interpretation:
     ---------------
     1. While the points of sample quantiles lies on the line, this means, that the
     sample points fits to the standard normal distribution.
@@ -177,7 +173,7 @@ def qqplot(vector: list):
     3. Otherwise, if the points are below the line, this means we are getting too low results,
     than we have to get, if we our sample data have normal distribution.
      
-
+    -----
     Args:
         vector (list): 1D vector.
 
@@ -199,10 +195,18 @@ def qqplot(vector: list):
     plt.title("Q-Q plot")
     plt.show()
 
-def flatten(v: list):
+def flatten(v: list) -> list:
     """Return flatten list"""
     lst = []
     for i in range(len(v)):
         for item in v[i]:
             lst.append(item)
     return lst
+
+def paired_diff(a: list, b: list) -> list:
+    """Return a list with a pairwise difference of elements"""
+    assert len(a) == len(b)
+    diff = []
+    for ai, bi in zip(a, b):
+        diff.append(ai - bi)
+    return diff
