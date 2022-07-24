@@ -2,7 +2,7 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
-def mean(vector: list) -> float:
+def mean(vector: list, ddof: int = None) -> float:
     """Return the mean value of the vector.
 
     Info:
@@ -20,17 +20,21 @@ def mean(vector: list) -> float:
     -----
     Args:
         vector (list): value vector
+        ddof (int): degrees of freedom
 
     Returns:
         float: the mean value
     """
     m = 0
-    no = len(vector)
+    if ddof == None:
+        no = len(vector)
+    else:
+        no = ddof
     for item in vector:
         m += item
     return m / no
 
-def var(vector: list) -> float:
+def var(vector: list, ddof: int = None) -> float:
     """Return variance of the vector
 
     Info:
@@ -50,17 +54,19 @@ def var(vector: list) -> float:
     -----
     Args:
         vector (list): value vector
+        ddof (int): degrees of freedom
 
     Returns:
         float: variance
     """
-    E = mean(vector)
+    E = mean(vector, ddof=ddof)
+
     var = []
     for x in vector:
         var.append((x - E)**2)
-    return mean(var)
+    return mean(var, ddof)
 
-def std(vector: list) -> float:
+def std(vector: list, ddof: int = None) -> float:
     """Return Standard Deviation of vector
 
     Info:
@@ -78,11 +84,12 @@ def std(vector: list) -> float:
     -----
     Args:
         vector (list): value vector
+        ddof (int): degrees of freedom
 
     Returns:
         float: standart deviation value
     """
-    return var(vector)**0.5
+    return var(vector, ddof=ddof)**0.5
 
 def standard_error(vector: list) -> float:
     """Return the standard error of the vector
@@ -102,7 +109,7 @@ def standard_error(vector: list) -> float:
     Returns:
         float: Standard error value
     """
-    sdev = std(vector)
+    sdev = std(vector, len(vector)-1)
     sdist = len(vector)**0.5
     return sdev / sdist
 
@@ -210,3 +217,93 @@ def paired_diff(a: list, b: list) -> list:
     for ai, bi in zip(a, b):
         diff.append(ai - bi)
     return diff
+
+def covariation(x: list, y: list) -> float:
+    """Return covariation value
+
+    Info:
+    -----
+    It is like the raw (unnormalized) value of relationship between two samples of data.
+    If the data has positive relationship, the covariation value will be positive, otherwise negative
+    (or approximately will be 0). To calculate the relationship between 2 samples, we calculate 
+    mean value for X data and Y data. If most samples of data located higher X mean and Y mean AND 
+    lower X mean and Y mean, this mean our data has POSITIVE correlation (covariation), because 
+    points are located in left lower square and upper right square.
+
+    Example:
+    --------
+    * +------+------+
+    * |oooooo|xxxxxx|
+    * |oooooo|xxxxxx|
+    * +------+------+
+    * |xxxxxx|oooooo|
+    * |xxxxxx|oooooo|
+    * +------+------+
+
+    - If we imagine, that we have only "x" values, then relationship will be POSITIVE
+    - If only "o" values, then NEGATIVE relationship
+
+    Steps:
+    ------
+    1. Calculate the mean values for x and y datas (X and Y)
+    2. For each element in x and y calculate the difference between (xi, X) and (yi, Y)
+    3. Multiply the X difference and Y difference, if X diff is positive (+), 
+    but Y diff is negative (-), then the general difference will be negative. 
+    (++ = +; -+ = -; +- = -; -- = +)
+    4. Calculate the mean difference, that will be 'covariance' value
+
+    Formula:
+    --------
+    `cov = MEAN( (xi - X) * (yi - Y) )`
+    
+    where:
+        xi, yi: each value in data
+        X, Y: mean values for x and y data
+
+    Args:
+        x, y (list): array lists of data to compare
+
+    Returns:
+        float: covariation value
+    """
+    assert len(x) == len(y)
+    X = mean(x, len(x)-1)
+    Y = mean(y, len(x)-1)
+
+    cov = []
+    for xi, yi in zip(x, y):
+        ci = (xi - X) * (yi - Y)
+        cov.append(ci)
+    
+    cov_mean = mean(cov, ddof=len(x)-1)
+    return cov_mean
+
+def correlation(x: list, y: list):
+    """Return correlation coefficient
+
+    Info:
+    -----
+    Correlation coefficient, also called Pearson Correlation coefficient 
+    shows the relationship between 2 samples of data. This is the covariation value,
+    divided by product of std(x) and std(y) to transform the value 
+    into range from -1 to 1.
+
+    Formula:
+    --------
+    `r_xy = cov / (std(x) * std(y))`
+
+        where
+            r_xy: correlation coefficient
+            cov: covariation value
+
+    Args:
+        x, y (list): array list of data to compare
+
+    Returns:
+        float: correlation coefficient value
+    """
+    cov = covariation(x, y)
+    x_std = std(x, len(x)-1)
+    y_std = std(y, len(y)-1)
+
+    return cov / (x_std * y_std)
