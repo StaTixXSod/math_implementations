@@ -6,26 +6,10 @@ np.random.seed(43)
 v1 = np.random.standard_t(100, 1000)
 v2 = np.random.standard_t(100, 1000)
 
-print(np.corrcoef(v1, v2))
-print(correlation(v1, v2))
+x = [4, 5, 2, 3, 1]
+y = [2, 1, 4, 3, 5]
+# x = [43, 21, 25, 42, 57, 59]
+# y = [99, 65, 79, 75, 87, 81]
 
-print(np.cov(v1, v2))
-print(covariation(v1, v2))
-# rvs = stats.norm.rvs(loc=5, scale=10, size=(50, 2), random_state=42)
-
-# print(one_sample_ttest(v1, v2))
-# print(stats.ttest_ind(v1, v2))
-
-# print(t_value(10.8, 10, 2, 25))
-# print(paired_ttest_simp(89.9, 80.7, 11.3, 11.7, 20, 20))
-
-# print(paired_ttest(v1, v2))
-# print(ttest_rel(v1, v2))
-
-# print(two_sample_ttest(v1, v2))
-# print(ttest_ind(v1, v2))
-
-# qqplot(v1)
-
-# print(np.median(v1))
-# print(median(v1))
+print(correlation(x, y))
+print(np.corrcoef(x, y))

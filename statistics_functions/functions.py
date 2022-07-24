@@ -204,26 +204,19 @@ def qqplot(vector: list):
 
 def flatten(v: list) -> list:
     """Return flatten list"""
-    lst = []
-    for i in range(len(v)):
-        for item in v[i]:
-            lst.append(item)
-    return lst
+    return [i for j in v for i in j]
 
 def paired_diff(a: list, b: list) -> list:
     """Return a list with a pairwise difference of elements"""
     assert len(a) == len(b)
-    diff = []
-    for ai, bi in zip(a, b):
-        diff.append(ai - bi)
-    return diff
+    return [ai - bi for ai, bi in zip(a, b)]
 
 def covariation(x: list, y: list) -> float:
     """Return covariation value
 
     Info:
     -----
-    It is like the raw (unnormalized) value of relationship between two samples of data.
+    It is like the VARiance, but for 2 arrays, that shows the value of relationship between two samples of data.
     If the data has positive relationship, the covariation value will be positive, otherwise negative
     (or approximately will be 0). To calculate the relationship between 2 samples, we calculate 
     mean value for X data and Y data. If most samples of data located higher X mean and Y mean AND 
@@ -267,18 +260,12 @@ def covariation(x: list, y: list) -> float:
         float: covariation value
     """
     assert len(x) == len(y)
-    X = mean(x, len(x)-1)
-    Y = mean(y, len(x)-1)
-
-    cov = []
-    for xi, yi in zip(x, y):
-        ci = (xi - X) * (yi - Y)
-        cov.append(ci)
-    
+    X, Y = mean(x), mean(y)
+    cov = [(xi - X) * (yi - Y) for xi, yi in zip(x, y)]
     cov_mean = mean(cov, ddof=len(x)-1)
     return cov_mean
 
-def correlation(x: list, y: list):
+def correlation(x: list, y: list, formula: str="1") -> float:
     """Return correlation coefficient
 
     Info:
@@ -290,20 +277,59 @@ def correlation(x: list, y: list):
 
     Formula:
     --------
-    `r_xy = cov / (std(x) * std(y))`
+    * `r_xy = cov / (std(x) * std(y))`
 
         where
             r_xy: correlation coefficient
             cov: covariation value
+    
+    * `cov(x, y) = E[(xi - X) * (yi - Y)]`
 
+    Formula 1:
+    ----------
+    The formula for 'r' can also be written as:
+
+    `r_xy = num / den`
+    
+    where:
+    * `num = E[xy] - E[x] * E[y]`
+    * `den = SQRT((E[x^2] - E[x])^2 * (E[y^2] - E[y])^2)`
+
+    Formula 2:
+    ----------
+    * `cov(x, y) = SUM((xi - X) * (yi - Y))`
+    * `sdev = SQRT( SUM((xi - X)^2) * SUM((yi - Y)^2) )`
+    * `r_xy = cov / sdev`
+
+    -----
     Args:
         x, y (list): array list of data to compare
 
     Returns:
         float: correlation coefficient value
     """
-    cov = covariation(x, y)
-    x_std = std(x, len(x)-1)
-    y_std = std(y, len(y)-1)
+    assert len(x) == len(y)
+    xy = mean(paired_prod(x, y))
+    X, Y = mean(x), mean(y)
+    
+    if formula == "1":
+        num = xy - X * Y
+        x_var = mean(squared(x)) - mean(x)**2
+        y_var = mean(squared(y)) - mean(y)**2
+        den = (x_var * y_var)**0.5
+        return num / den
+    
+    elif formula == "2":
+        cov = sum([(xi - X) * (yi - Y) for xi, yi in zip(x, y)])
+        xvar = sum([(xi - X)**2 for xi in x])
+        yvar = sum([(yi - Y)**2 for yi in y])
+        sdev = (xvar * yvar)**0.5
+        return cov / sdev
 
-    return cov / (x_std * y_std)
+def paired_prod(x: list, y: list) -> list:
+    """Return a list of pairwise multiplications"""
+    return [xi*yi for xi, yi in zip(x, y)]
+    
+def squared(a: list) -> list:
+    """Return the same list with squared values"""
+    return [ai**2 for ai in a]
