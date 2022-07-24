@@ -2,8 +2,6 @@ import sys, os
 sys.path.append(os.getcwd())
 from statistics_functions.functions import *
 import pandas as pd
-from scipy.stats import t
-from scipy.stats import f
 from scipy.stats import f_oneway
 
 
@@ -46,14 +44,14 @@ def one_way_anova(*args) -> float:
 
     Formula:
     --------
-    F = (SSB / df_ssb) / (SSW / df_ssw)
+    `F = (SSB / df_ssb) / (SSW / df_ssw)`
 
     -----
     Args:
     sample_1, sample_2, ... ,sample_n: (list) Samples of data to compare
     """
-    ssw, df_ssw = SSW(args)
     ssb, df_ssb = SSB(args)
+    ssw, df_ssw = SSW(args)
 
     ssb_div = ssb / df_ssb
     ssw_div = ssw / df_ssw
@@ -76,13 +74,13 @@ def TSS(vector: list) -> tuple:
 
     Formula:
     --------
-    >>> TSS = SUM( (yi - Y)^2 )
+    `TSS = SUM( (yi - Y)^2 )`
         
         where
             yi: item in vector,
             Y: vector mean value
 
-    >>> df = NO - 1
+    `df = NO - 1`
 
         where
             df: Degrees of freedom
@@ -128,14 +126,14 @@ def SSB(groups: list) -> tuple:
 
     Formula:
     --------
-    >>> SSB = NO * (m - X)
+    `SSB = NO * (m - X)`
 
         where
             NO: Number observations
             m: Mean within the group
             X: General mean of all groups
 
-    >>> df = number_of_groups - 1
+    `df = number_of_groups - 1`
 
     -----
     Args:
@@ -172,13 +170,13 @@ def SSW(groups: list) -> tuple:
 
     Formula:
     --------
-    >>> SSW = SUM(TSS(group_i))
+    `SSW = SUM(TSS(group_i))`
 
         where
             TSS: Total sum of squares for each group
             group_i: Specific group
 
-    >>> df = SUM(NO_i - 1)
+    `df = SUM(NO_i - 1)`
         
         where
             NO_i: Number observations in group
@@ -201,23 +199,18 @@ def SSW(groups: list) -> tuple:
         ssw += tss
     return (ssw, df)
 
-# l1 = [3, 1, 2]
-# l2 = [5, 3, 4]
-# l3 = [7, 6, 5]
+l1 = [3, 1, 2]
+l2 = [5, 3, 4]
+l3 = [7, 6, 5]
 
-# print(one_way_anova(l1, l2, l3))
-# print(f_oneway(l1, l2, l3))
+print(one_way_anova(l1, l2, l3))
+print(f_oneway(l1, l2, l3))
 
-data = pd.read_csv("~/Downloads/genetherapy.csv")
-a = data[data['Therapy']=="A"]['expr'].values
-b = data[data['Therapy']=="B"]['expr'].values
-c = data[data['Therapy']=="C"]['expr'].values
-d = data[data['Therapy']=="D"]['expr'].values
+# data = pd.read_csv("~/Downloads/genetherapy.csv")
+# a = data[data['Therapy']=="A"]['expr'].values
+# b = data[data['Therapy']=="B"]['expr'].values
+# c = data[data['Therapy']=="C"]['expr'].values
+# d = data[data['Therapy']=="D"]['expr'].values
 
-a = list(a)
-b = list(b)
-c = list(c)
-d = list(d)
-
-print(one_way_anova(a, b, c, d))
-print(f_oneway(a, b, c, d))
+# print(one_way_anova(a, b, c, d))
+# print(f_oneway(a, b, c, d))
