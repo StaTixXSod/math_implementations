@@ -3,6 +3,7 @@ import sys
 
 sys.path.append(os.getcwd())
 from statistics_functions.functions import *
+from scipy.stats import t
 
 def one_sample_ttest(a: list, popmean: float) -> float:
     """Return T test statistic value for population data
@@ -38,8 +39,8 @@ def one_sample_ttest(a: list, popmean: float) -> float:
     t = (popmean - sample_mean) / standard_error(a)
     return t
 
-def two_sample_ttest(a: list, b: list) -> float:
-    """Return T-test statistic value for two samples
+def two_sample_ttest(a: list, b: list) -> tuple:
+    """Return T-test statistic value for two independent samples and p value
 
     Info:
     -----
@@ -90,14 +91,15 @@ def two_sample_ttest(a: list, b: list) -> float:
     """
     X1, X2 = mean(a), mean(b)
     sd1, sd2 = std(a), std(b)
-    n1, n2 = len(a), len(b)
+    n1, n2 = len(a)-1, len(b)-1
 
     se1 = sd1**2 / n1
     se2 = sd2**2 / n2
 
-    t = (X1 - X2) / (se1 + se2)**0.5
+    t_val = (X1 - X2) / (se1 + se2)**0.5
+    p_val = t.sf(abs(t_val), n1+n2)*2
 
-    return t
+    return (t_val, p_val)
 
 def paired_ttest(a: list, b: list) -> float:
     """Return T Student Criterion statistic value
@@ -155,7 +157,9 @@ def paired_ttest(a: list, b: list) -> float:
     """
     paired_differences = paired_diff(a, b)
     mean_differences = mean(paired_differences)
-    SE = standard_error(paired_differences)
-    t = mean_differences / SE
     df = len(paired_differences) - 1
-    return t
+    SE = standard_error(paired_differences)
+    t_val = mean_differences / SE
+    p_val = t.sf(abs(t_val), df)*2
+
+    return (t_val, p_val)

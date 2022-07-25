@@ -3,9 +3,10 @@ sys.path.append(os.getcwd())
 from statistics_functions.functions import *
 import pandas as pd
 from scipy.stats import f_oneway
+from scipy.stats import f
 
 
-def one_way_anova(*args) -> float:
+def one_way_anova(*args) -> tuple:
     """
     Return statistic value of the "one way anova"
 
@@ -60,8 +61,10 @@ def one_way_anova(*args) -> float:
 
     print("SSB: ", df_ssb)
     print("SSW: ", df_ssw)
+
+    p_val = f.sf(f_val, df_ssb, df_ssw)
     
-    return f_val
+    return (f_val, p_val)
 
 def TSS(vector: list) -> tuple:
     """
