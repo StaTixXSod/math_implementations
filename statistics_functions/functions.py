@@ -266,14 +266,16 @@ def covariation(x: list, y: list) -> float:
     return cov_mean
 
 def correlation(x: list, y: list, formula: str="1") -> float:
-    """Return correlation coefficient
+    """Return Pearson correlation coefficient
 
     Info:
     -----
     Correlation coefficient, also called Pearson Correlation coefficient 
     shows the relationship between 2 samples of data. This is the covariation value,
     divided by product of std(x) and std(y) to transform the value 
-    into range from -1 to 1.
+    into range from -1 to 1. 
+    This coefficient better to use, when data has linear relationship. If it's not,
+    for example if function has monotonic relationship, use Spearman correlation coefficient.
 
     Formula:
     --------
@@ -309,10 +311,10 @@ def correlation(x: list, y: list, formula: str="1") -> float:
         float: correlation coefficient value
     """
     assert len(x) == len(y)
-    xy = mean(paired_prod(x, y))
     X, Y = mean(x), mean(y)
     
     if formula == "1":
+        xy = mean(paired_prod(x, y))
         num = xy - X * Y
         x_var = mean(squared(x)) - mean(x)**2
         y_var = mean(squared(y)) - mean(y)**2
