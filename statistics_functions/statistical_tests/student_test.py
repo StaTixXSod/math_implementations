@@ -1,11 +1,11 @@
 import os
 import sys
-
 sys.path.append(os.getcwd())
+from typing import Tuple
 from statistics_functions.functions import *
 from scipy.stats import t
 
-def one_sample_ttest(a: list, popmean: float) -> float:
+def one_sample_ttest(a: list, popmean: float) -> Tuple[float, float]:
     """Return T test statistic value for population data
     and sample data
 
@@ -33,13 +33,18 @@ def one_sample_ttest(a: list, popmean: float) -> float:
     Args:
         population (list): population data
         sample (list): sample data
+    
+    Return:
+        statistic (float): t value
+        pvalue (float): p value
     """
     sample_mean = mean(a)
 
-    t = (popmean - sample_mean) / standard_error(a)
-    return t
+    t_val = (sample_mean - popmean) / standard_error(a)
+    p_val = t.sf(abs(t_val), len(a))*2
+    return (t_val, p_val)
 
-def two_sample_ttest(a: list, b: list) -> tuple:
+def two_sample_ttest(a: list, b: list) -> Tuple[float, float]:
     """Return T-test statistic value for two independent samples and p value
 
     Info:
@@ -88,6 +93,7 @@ def two_sample_ttest(a: list, b: list) -> tuple:
 
     Returns:
         float: statistic value t
+        float: pvalue
     """
     X1, X2 = mean(a), mean(b)
     sd1, sd2 = std(a), std(b)
@@ -101,7 +107,7 @@ def two_sample_ttest(a: list, b: list) -> tuple:
 
     return (t_val, p_val)
 
-def paired_ttest(a: list, b: list) -> float:
+def paired_ttest(a: list, b: list) -> Tuple[float, float]:
     """Return T Student Criterion statistic value
     
     Info:
@@ -154,6 +160,10 @@ def paired_ttest(a: list, b: list) -> float:
     Args:
         a (list): pre-test data
         b (list): post-test data
+    
+    Returns:
+        float: statistic value t
+        float: pvalue
     """
     paired_differences = paired_diff(a, b)
     mean_differences = mean(paired_differences)
