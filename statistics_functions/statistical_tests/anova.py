@@ -1,14 +1,23 @@
 import sys, os
 sys.path.append(os.getcwd())
+from typing import Tuple, NamedTuple
 from statistics_functions.functions import *
-import pandas as pd
-from scipy.stats import f_oneway
 from scipy.stats import f
+import pandas as pd
 
+class FactorialAnovaStatistics(NamedTuple):
+    sum_sq: float
+    df: int
+    statistic: float
+    pvalue: float
 
-def one_way_anova(*args) -> tuple:
+class OneWayAnovaStatistics(NamedTuple):
+    statistic: float
+    pvalue: float
+
+def one_way_anova(*args: list) -> OneWayAnovaStatistics:
     """
-    Return statistic value of the "one way anova"
+    Return statistic value of the "one way anova" and it's pvalue
 
     Info:
     -----
@@ -50,6 +59,10 @@ def one_way_anova(*args) -> tuple:
     -----
     Args:
     sample_1, sample_2, ... ,sample_n: (list) Samples of data to compare
+
+    Return:
+    statistic: (float) statistic F value
+    pvalue: (float) pvalue for statistic
     """
     ssb, df_ssb = SSB(args)
     ssw, df_ssw = SSW(args)
@@ -58,15 +71,11 @@ def one_way_anova(*args) -> tuple:
     ssw_div = ssw / df_ssw
 
     f_val = ssb_div / ssw_div
-
-    print("SSB: ", df_ssb)
-    print("SSW: ", df_ssw)
-
     p_val = f.sf(f_val, df_ssb, df_ssw)
     
-    return (f_val, p_val)
+    return OneWayAnovaStatistics(f_val, p_val)
 
-def TSS(vector: list) -> tuple:
+def TSS(vector: list) -> float:
     """
     Return total sum of squares
 
@@ -107,15 +116,10 @@ def TSS(vector: list) -> tuple:
             The degrees of freedom
     """
     Y = mean(vector)
-    tss = 0
-    df = len(vector) - 1
-    for yi in vector:
-        tss += (yi - Y)**2
-    
-    return (tss, df)
+    return sum([(yi - Y)**2 for yi in vector])
 
-def SSB(groups: list) -> tuple:
-    """Return the sum of squares between groups
+def SSB(groups: list) -> Tuple[float, int]:
+    """Return the sum of squares between groups and ddof
 
     Info:
     -----
@@ -149,18 +153,12 @@ def SSB(groups: list) -> tuple:
             The degrees of freedom
     """
     X = mean(flatten(groups))
-    ssb = 0
     df = len(groups) - 1
-    
-    for group in groups:
-        num = len(group)
-        m = mean(group)
-        ssb += num * (m - X)**2
-
+    ssb = sum([len(group) * (mean(group) - X)**2 for group in groups])
     return (ssb, df)
 
-def SSW(groups: list) -> tuple:
-    """Return the sum of squares within groups
+def SSW(groups: list) -> Tuple[float, int]:
+    """Return the sum of squares within groups and ddof
 
     Info:
     -----
@@ -194,26 +192,66 @@ def SSW(groups: list) -> tuple:
         df: int
             The degrees of freedom
     """
-    ssw = 0
-    df = 0
-    for group in groups:
-        tss, df_tss_i = TSS(group)
-        df += df_tss_i
-        ssw += tss
+    df = sum([len(group)-1 for group in groups])
+    ssw = sum([TSS(group) for group in groups])
     return (ssw, df)
 
-l1 = [3, 1, 2]
-l2 = [5, 3, 4]
-l3 = [7, 6, 5]
+def two_way_anova(data: pd.DataFrame, features: list, target: str) -> FactorialAnovaStatistics:
+    """Return the f statistic of data and its pvalue
 
-print(one_way_anova(l1, l2, l3))
-print(f_oneway(l1, l2, l3))
+    Info:
+    -----
+    A two-way ANOVA (“analysis of variance”) is used to determine whether
+    or not there is a statistically significant difference between the means 
+    of three or more independent groups that have been split on two variables 
+    (sometimes called “factors”).
 
-# data = pd.read_csv("~/Downloads/genetherapy.csv")
-# a = data[data['Therapy']=="A"]['expr'].values
-# b = data[data['Therapy']=="B"]['expr'].values
-# c = data[data['Therapy']=="C"]['expr'].values
-# d = data[data['Therapy']=="D"]['expr'].values
+    Args:
+        data (pd.DataFrame): DataFrame with data to compare
+        features (list): the features to compare
 
-# print(one_way_anova(a, b, c, d))
-# print(f_oneway(a, b, c, d))
+    Returns:
+        Tuple[float, float]: F statistic and p value
+    """
+    feature_data = {}
+    groupped = data.groupby(features)
+    for group, df in groupped:
+        name = "_".join([str(g) for g in group])
+        feature_data[name] = df[target].values
+        # feature_data[group] = df[target].values
+    feature_data = pd.DataFrame(feature_data)
+
+    mean_values = feature_data.mean()
+    std_values = feature_data.std()
+
+    print(pd.DataFrame({
+        "N": feature_data.shape[0],
+        "Mean": mean_values,
+        "STD": std_values
+    }))
+
+    mean_by_feature = {}
+    for feature in features:
+        feature_group = data.groupby(feature)
+        for group, df in feature_group:
+            mean_by_feature[group] = [np.mean(df[target])]
+
+    mean_by_feature = pd.DataFrame(mean_by_feature)
+    grand_mean = np.mean(mean_values)
+    ss_first_feature = np.sum(np.square(mean_by_feature - grand_mean), axis=1)
+
+    # sum_sq = ...
+    # df = ...
+    # t_val = ...
+    # p_val = ...
+
+
+def SST(data: np.array, grand_mean):
+    """Return Sum of squares total
+
+    Args:
+        vector (pd.DataFrame): data
+    """
+    X = np.mean(data)
+    sst = [(xi - X)**2 for xi in data]
+
