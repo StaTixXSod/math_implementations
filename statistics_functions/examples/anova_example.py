@@ -35,9 +35,6 @@ data = pd.read_csv("data/atherosclerosis.csv")
 print(two_way_anova(data, features=["age", "dose"], target='expr'))
 
 
-
-
-
-# model = ols('expr ~ C(age) + C(dose) + C(age):C(dose)', data=data).fit()
-# # model = ols('expr ~ C(age) + C(dose)', data=data).fit()
-# print(sm.stats.anova_lm(model, typ=2))
+model = ols('expr ~ C(age) + C(dose) + C(age):C(dose)', data=data).fit()
+# model = ols('expr ~ C(age) + C(dose)', data=data).fit()
+print(sm.stats.anova_lm(model, typ=2))

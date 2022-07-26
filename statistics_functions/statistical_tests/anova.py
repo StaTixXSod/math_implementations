@@ -86,7 +86,7 @@ def TSS(vector: list) -> float:
 
     Formula:
     --------
-    `TSS = SUM( (yi - Y)^2 )`
+    `TSS = Σ( (yi - Y)^2 )`
         
         where
             yi: item in vector,
@@ -115,8 +115,8 @@ def TSS(vector: list) -> float:
         df: int
             The degrees of freedom
     """
-    Y = mean(vector)
-    return sum([(yi - Y)**2 for yi in vector])
+    Y = np.mean(vector)
+    return np.sum([(yi - Y)**2 for yi in vector])
 
 def SSB(groups: list) -> Tuple[float, int]:
     """Return the sum of squares between groups and ddof
@@ -171,13 +171,13 @@ def SSW(groups: list) -> Tuple[float, int]:
 
     Formula:
     --------
-    `SSW = SUM(TSS(group_i))`
+    `SSW = Σ(TSS(group_i))`
 
         where
             TSS: Total sum of squares for each group
             group_i: Specific group
 
-    `df = SUM(NO_i - 1)`
+    `df = Σ(NO_i - 1)`
         
         where
             NO_i: Number observations in group
@@ -206,6 +206,18 @@ def two_way_anova(data: pd.DataFrame, features: list, target: str) -> FactorialA
     of three or more independent groups that have been split on two variables 
     (sometimes called “factors”).
 
+    Steps:
+    ------
+    1. Calculate the mean of all values (grand mean)
+    2. Calculate Sum of Squares for first factor (feature):
+        Calculate the mean for all first feature group.
+        All means substract from the grand mean.
+        Sum all squared differences.
+    3. Calculate Sum of Squares for second factor (feature):
+        The same process - as in step 2.
+    4. Calculate Sum of Squares Within (Error)
+
+    -----
     Args:
         data (pd.DataFrame): DataFrame with data to compare
         features (list): the features to compare
@@ -213,45 +225,85 @@ def two_way_anova(data: pd.DataFrame, features: list, target: str) -> FactorialA
     Returns:
         Tuple[float, float]: F statistic and p value
     """
-    feature_data = {}
+    # 1. Find the sum of squares for each feature
+    statistic, ss_ssb, df_ssb = SSB_pd(data, features, target)
+
+    # 2. Find the sum of squares within (SSW) (Error)
+    statistic, ss_ssw, df_ssw = SSW_pd(statistic, data, features, target)
+
+    # 3. Calculate total sum of squares
+    ss_total = TSS(data["expr"].values)
+
+    # 4. Calculate Sum of Squares Interaction
+    statistic, ss_interaction, df_interaction = interaction(statistic, ss_total, ss_ssb, df_ssb, ss_ssw, features)
+    
+    # 5. Calculate F values
+    ms_ssb = [ssb_i / df_ssb_i for ssb_i, df_ssb_i in zip(ss_ssb, df_ssb)]
+    ms_ssw = ss_ssw / df_ssw
+    ms_interaction = ss_interaction / df_interaction
+    f_features = [i / ms_ssw for i in ms_ssb]
+    f_interaction = ms_interaction / ms_ssw
+    print(f_features)
+    print(f_interaction)
+
+    # 6. Pvalue
+    p_features = [f.sf(f_feature, df_ssb, df_ssw) for f_feature in f_features]
+    p_interaction = f.sf(f_interaction, df_ssb, df_ssw)
+    print(p_features)
+    print(p_interaction)
+    
+    # Take all together
+    statistic = pd.DataFrame(statistic)
+    print("[INFO] The difference between group mean and gen mean")
+    print(statistic)
+
+def SSW_pd(statistic: dict, data: pd.DataFrame, features: list, target: str):
     groupped = data.groupby(features)
-    for group, df in groupped:
-        name = "_".join([str(g) for g in group])
-        feature_data[name] = df[target].values
-        # feature_data[group] = df[target].values
-    feature_data = pd.DataFrame(feature_data)
+    ss_resid_list = []
+    df_resid = 0
+    for _, groupped_df in groupped:
+        values = groupped_df[target]
+        group_mean = np.mean(values)
+        ss = np.sum([(vi - group_mean)**2 for vi in values])
+        ss_resid_list.append(ss)
+        df_resid += groupped_df.shape[0] - 1
+    ss_resid = sum(ss_resid_list)
+    statistic["feature"].append("residual")
+    statistic["sum_sq"].append(ss_resid)
+    statistic['df'].append(df_resid)
+    
+    return statistic, ss_resid, df_resid
 
-    mean_values = feature_data.mean()
-    std_values = feature_data.std()
-
-    print(pd.DataFrame({
-        "N": feature_data.shape[0],
-        "Mean": mean_values,
-        "STD": std_values
-    }))
-
-    mean_by_feature = {}
+def SSB_pd(data: pd.DataFrame, features: list, target: str):
+    statistic = {"feature": [], "sum_sq": [], "df": []}
+    ssb_features = []
+    df_ssb = []
+    grand_mean = np.mean(data["expr"].values)
+    # For each feature... [age, dose]
     for feature in features:
-        feature_group = data.groupby(feature)
-        for group, df in feature_group:
-            mean_by_feature[group] = [np.mean(df[target])]
+        feature_means = [] # add up the means for each group of feature
+        feature_group = data.groupby(feature) # group by feature (age)
+        # For each group with feature find the mean...
+        for _, feature_df in feature_group:
+            values = feature_df[target]
+            feature_mean = np.mean(values)
+            feature_means.append(feature_mean)
+        # Calculate the sum of squared difference 
+        # between the group mean and the gen mean
+        n = feature_df.shape[0]
+        sum_of_squares = np.sum([n * (fm - grand_mean)**2 for fm in feature_means])
+        statistic['feature'].append(feature)
+        statistic['sum_sq'].append(sum_of_squares)
+        statistic['df'].append(len(features)-1)
+        ssb_features.append(sum_of_squares)
+        df_ssb.append(data[feature].nunique()-1)
+        
+    return statistic, ssb_features, df_ssb
 
-    mean_by_feature = pd.DataFrame(mean_by_feature)
-    grand_mean = np.mean(mean_values)
-    ss_first_feature = np.sum(np.square(mean_by_feature - grand_mean), axis=1)
-
-    # sum_sq = ...
-    # df = ...
-    # t_val = ...
-    # p_val = ...
-
-
-def SST(data: np.array, grand_mean):
-    """Return Sum of squares total
-
-    Args:
-        vector (pd.DataFrame): data
-    """
-    X = np.mean(data)
-    sst = [(xi - X)**2 for xi in data]
-
+def interaction(statistic, total, ssb, df_ssb, ssw, features):
+    ss_interaction = total - np.sum(ssb) - ssw
+    df = np.cumprod(df_ssb)[-1]
+    statistic["feature"].append(":".join([*features]))
+    statistic["sum_sq"].append(ss_interaction)
+    statistic["df"].append(df)
+    return statistic, ss_interaction, df
