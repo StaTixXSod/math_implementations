@@ -48,7 +48,7 @@ def r2_coefficient_score(predictions: list, answers: list) -> float:
     Interpretation:
     ---------------
     * If the `ssres` approrimately equals to `sstotal`, this means that the ratio 
-    between `ssres` and `sstotal` will be tend to 1. Because of that `r^2 = 1 - 1 -> 0`.
+    between `ssres` and `sstotal` will be tend to 1. Therefore `r^2 = 1 - 1 -> 0`.
     This means that our model doesn't explain variability of dependent variable.
 
     * If we have strong positive correlation between X and y, this means our "y" values very 
