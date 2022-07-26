@@ -187,7 +187,7 @@ def det(A: list) -> float:
     matrix product of each row value with its minor value. Then sum it all together changing 
     the signs in the right places.
 
-    >>> | A | = SUM(
+    >>> | A | = Σ(
         (+) A[i][j] * M(A[i][j])
         (-) A[i][j+1] * M(A[i][j+1])
         (+) ...

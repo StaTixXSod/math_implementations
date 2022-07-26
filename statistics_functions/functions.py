@@ -299,8 +299,8 @@ def correlation(x: list, y: list, formula: str="1") -> float:
 
     Formula 2:
     ----------
-    * `cov(x, y) = SUM((xi - X) * (yi - Y))`
-    * `sdev = SQRT( SUM((xi - X)^2) * SUM((yi - Y)^2) )`
+    * `cov(x, y) = Σ((xi - X) * (yi - Y))`
+    * `sdev = SQRT( Σ((xi - X)^2) * Σ((yi - Y)^2) )`
     * `r_xy = cov / sdev`
 
     -----
