@@ -6,7 +6,7 @@ matrix = []
 for i in range(n):
     matrix.append(list(map(float, input().strip().split(" "))))
 
-coefs = solve_linear_equation_QR(matrix)
+coefs = solve_with_qr_decomposition(matrix)
 print(*coefs)
 
 """

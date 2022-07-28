@@ -1,29 +1,32 @@
-import os
-import sys
-
+import os, sys
 sys.path.append(os.getcwd())
 from linalg.functions import *
+from typing import List, Tuple
 
-def solve_linear_equation_QR(matrix) -> list:
+matrix_shape = List[List[float]]
+vector_shape = List[float]
+
+
+def solve_with_qr_decomposition(matrix: matrix_shape) -> vector_shape:
     """
     Solve linear equation using QR decomposition.
 
     -----
-    INFO:
+    Info:
     -----
     At first to solve linear equation using QR decomposition, 
     we have to get Q and R matrices and transform initial formula:
-    >>> Ax = b
+    • `Ax = b`
 
     to:
-    >>> QRx = b
+    • `QRx = b`
 
     because we decompose A matrix into Q and R matrices => A = QR.
 
     x: is our coefficients we are willing to find (solve equation).
     To get x, the formula above transforms to:
-    >>> (QR) @ (QR)^-1 @ x = (QR)^-1 @ b    | * (QR)^-1
-    >>> x = R^-1 @ Q.T @ b 
+    • `(QR) @ (QR)^-1 @ x = (QR)^-1 @ b    | * (QR)^-1`
+    • `x = R^-1 @ Q.T @ b`
     
     because Q.T = Q^-1 and A@A^-1 = I.
 
@@ -32,7 +35,7 @@ def solve_linear_equation_QR(matrix) -> list:
     will solve our equation.
 
     ------
-    STEPS:
+    Steps:
     ------
     1. Split original extended matrix into A (original matrix) 
     and b (answer vector)
@@ -42,25 +45,26 @@ def solve_linear_equation_QR(matrix) -> list:
     3. Find coefficient vector using formula: R^-1@Q.T@b
 
     Args:
-        matrix (list): Original extended matrix
+        matrix (matrix_shape): Original extended matrix
 
     Returns:
-        list: Coefficients vector
+        vector_shape: Vector of unknown variables
     """
     A, b = split_by_vectors(matrix)
-    Q, R = QR_decomposition(A)
+    Q, R = qr_decomposition(A)
 
     print_matrix(Q, "Q matrix:", 4)
     print_matrix(R, "R matrix:", 4)
 
-    coeffs = get_matrix_coefficients(Q, R, b)
-    return coeffs
+    params = get_equation_params(Q, R, b)
+    return params
 
-def QR_decomposition(A):
+
+def qr_decomposition(A) -> Tuple[matrix_shape, matrix_shape]:
     """
     Return Q and R matrices.
 
-    INFO:
+    Info:
     -----
     QR factorization is another method to solve linear equation. 
     QR factorization decompose original matrix into 2: 
@@ -69,7 +73,7 @@ def QR_decomposition(A):
     Q: Orthonormalized matrix. To get Q matrix use Gram-Schmidt process.
     R: Triangular matrix. Q.T@A
 
-    FORMULA:
+    Formula:
     --------
     A = QR -> Original matrix is the matrix product of Q and R
 
@@ -78,21 +82,22 @@ def QR_decomposition(A):
 
     -----
     Args:
-        A (list): Original matrix
+        A (matrix_shape): Original matrix
 
     Returns:
-        list: Q - orthonormalized matrix
-        list: R - triangular matrix
+        matrix_shape: Q - orthonormalized matrix
+        matrix_shape: R - triangular matrix
     """
     Q = gram_schmidt_orthonormalization(A)
 
-    Q = transpose(Q) # Return Q back to original size
-    A = transpose(A) # Return A back to original size
-    R = get_R_matrix(Q, A)
+    Q = transpose(Q)  # Return Q back to original shape
+    A = transpose(A)  # Return A back to original shape
+    R = get_r_matrix(Q, A)
 
     return Q, R
 
-def gram_schmidt_orthonormalization(A):
+
+def gram_schmidt_orthonormalization(A: matrix_shape) -> matrix_shape:
     """
     Return orthonormalized matrix (Q).
 
@@ -120,7 +125,7 @@ def gram_schmidt_orthonormalization(A):
     This process is useful when solving linear equations.
 
     Args:
-        A (list): Original matrix (list of list)
+        A (matrix_shape): Original matrix
     
     Steps:
     -------
@@ -132,15 +137,16 @@ def gram_schmidt_orthonormalization(A):
     Q = normalize_matrix(U)
     return Q
 
-def orthogonalize_matrix(A):
+
+def orthogonalize_matrix(A: matrix_shape) -> matrix_shape:
     """
     Return ortogonal matrix.
 
     Args:
-        A (list): Original matrix, represented with list of lists.
+        A (matrix_shape): Original matrix, represented with list of lists.
 
     Returns:
-        list: Transformed ortogonal matrix
+        matrix_shape: Transformed orthogonal matrix
 
     ---------------------------------
     Formula for orthogonal transform:
@@ -158,12 +164,12 @@ def orthogonalize_matrix(A):
 
     un = vn - proj_u1(vn) - proj_u2(vn) - ... - proj_un-1(vn)
     """
-    m, n = len(A), len(A[0]) # Columns (vectors), Rows (items)
+    m, n = len(A), len(A[0])  # Columns (vectors), Rows (items)
     U = [[] for _ in range(m)]
 
     # First U column will be the same as the A column
     U[0] = list(A[0])
-    
+
     # For each vector...
     for current_column in range(1, m):
         U[current_column] = list(A[current_column])
@@ -175,7 +181,8 @@ def orthogonalize_matrix(A):
                 U[current_column][i] -= proj * U[prev_column][i]
     return U
 
-def normalize_matrix(U):
+
+def normalize_matrix(U: matrix_shape) -> matrix_shape:
     """
     Return normalized matrix.
     
@@ -194,8 +201,8 @@ def normalize_matrix(U):
 
     en = un / ||un||
     """
-    m, n = len(U), len(U[0]) # Columns, Rows
-    Q = [[0]*n for _ in range(m)]
+    m, n = len(U), len(U[0])  # Columns, Rows
+    Q = [[0] * n for _ in range(m)]
 
     # For each vector...
     for current_vector in range(m):
@@ -204,14 +211,15 @@ def normalize_matrix(U):
         for i in range(n):
             Q[current_vector][i] = U[current_vector][i] / length
     return Q
-                
-def projection_value(A: list, U: list, i: int, j: int) -> float:
+
+
+def projection_value(A: matrix_shape, U: matrix_shape, i: int, j: int) -> float:
     """
     Return projection value of a certain column. (Only multiplication value)
 
     Args:
-        A (list): Original matrix
-        U (list): Transformed matrix
+        A (matrix_shape): Original matrix
+        U (matrix_shape): Transformed matrix
         i (int): Original vector index
         j (int): Transformed vector index (Previously transformed vectors)
     
@@ -231,59 +239,60 @@ def projection_value(A: list, U: list, i: int, j: int) -> float:
     u_u = mul(u, u)
     return f_u / u_u
 
-def get_R_matrix(Q, A):
+
+def get_r_matrix(Q: matrix_shape, A: matrix_shape) -> matrix_shape:
     """Calculates triangular matrix R
 
     Formula: 
     --------
-    R = Q.T@A
+    `R = Q.T@A`
 
     ---------
 
     Args:
-        Q (list): Orthonormalized matrix (n x m)
-        A (list): Original matrix (n x m)
+        Q (matrix_shape): Orthonormalized matrix (n x m)
+        A (matrix_shape): Original matrix (n x m)
 
     Returns:
-        list: Matrix R (m x m)
+        matrix_shape: Matrix R (m x m)
     """
-    R = matmul(transpose(Q), A)
-    return R
+    return matmul(transpose(Q), A)
 
-def get_matrix_coefficients(Q, R, b):
+
+def get_equation_params(Q: matrix_shape, R: matrix_shape, b: vector_shape):
     """
     Return matrix coefficients using QR matrices and answer vector b.
 
     -----
-    INFO:
+    Info:
     -----
     The formula of linear equation is:
 
-    Ax = b, where A - is an original matrix
+    Ax = b, where A - is an original coefficient matrix
 
-                  x - coeffictent vector to solve equation
+                  x - vector of unknown variables
 
-                  b - answer vector
+                  b - answer vector (contant)
 
     Matrix A is decomposed into Q and R matrices and formula became:
 
-    QRx = b
+    `QRx = b`
 
     To find x vector we multiply each side of equation by (QR)^-1, 
     where (QR)^-1 is the inverse matrix. As we know, Q.T@Q = I,
     so Q.T = Q^-1 and formula became:
 
-    x = R^-1 @ Q.T @ b
+    `x = R^-1 @ Q.T @ b`
 
     --------
-    FORMULA:
+    Formula:
     --------
-    C = Q.T@B
+    •`C = Q.T@B`
 
-    x = R^-1@C
+    •`x = R^-1@C`
 
     ------
-    STEPS:
+    Steps:
     ------
     1. Find C
 
@@ -293,24 +302,24 @@ def get_matrix_coefficients(Q, R, b):
 
 
     Args:
-        Q (list): Orthogonal matrix. Shape: (n, m)
+        Q (matrix_shape): Orthogonal matrix. Shape: (n, m)
 
-        R (list): Triangular matrix. Shape: (m, m)
+        R (matrix_shape): Triangular matrix. Shape: (m, m)
         
-        b (list): Answer vector. Shape: (n, 1)
+        b (vector_shape): Answer vector. Shape: (n, 1)
 
     Returns:
-        list: Coefficients list
+        vector_shape: List of unknown variables
     """
     b = transpose(list([b]))
-    C = matmul(transpose(Q), b) # Shape (m, 1)
+    C = matmul(transpose(Q), b)  # Shape (m, 1)
 
-    R_inverse = inverse(R)
+    r_inverse = inverse(R)
 
-    print_matrix(R_inverse, "Inverse R matrix:", 4)
-    I = matmul(R, R_inverse)
+    print_matrix(r_inverse, "Inverse R matrix:", 4)
+    I = matmul(R, r_inverse)
     print_matrix(I, "R@R-1 = I matrix:", 4)
 
-    RC = matmul(R_inverse, C)
+    RC = matmul(r_inverse, C)
     RC = transpose(RC)[0]
     return RC
