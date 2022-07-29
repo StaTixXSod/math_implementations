@@ -28,7 +28,7 @@ def matmul(A: matrix_shape, B: matrix_shape) -> matrix_shape:
     INFO:
     -----
     To perform matrix product of matrix A and matrix B, each row vector of matrix A 
-    multiplied by the each column vector of matrix B using scalar product (mul).
+    multiplied by each column vector of matrix B using scalar product (mul).
 
     Args:
         A (matrix_shape): Matrix A
@@ -324,3 +324,54 @@ def split_by_vectors(matrix: matrix_shape) -> Tuple[matrix_shape, vector_shape]:
     X = matrix_by_vector[:-1]
     y = matrix_by_vector[-1]
     return X, y
+
+
+def return_cropped_square_matrix(matrix: matrix_shape):
+    n, m = len(matrix), len(matrix[0])
+    if n < m:
+        trm = transpose(matrix)[:-1]
+        return transpose(trm)
+    else:
+        return matrix[:-1]
+
+
+def matrix_rank(matrix: matrix_shape) -> int:
+    """
+    Return the matrix rank value
+
+    Info:
+    -----
+    The matrix rank, roughly speaking, is the count of independent vectors.
+    The matrix rank can't be greater min row value or column value. So if
+    the matrix shape is (4, 5), the rank can't be greater 4.
+
+    If matrix consists of zeros, the rank of this matrix is 0. Also, if vectors
+    of this matrix are dependent or collinear, the rank of matrix decreases by the value
+    of dependent vectors.
+
+    Steps:
+    ------
+    1. Define max rank: N if N < M, else M
+    2. Define min rank: If the matrix has only zeros values -> min rank is 0, else min rank is 1
+    3.
+
+    Args:
+        matrix: the matrix
+
+    Returns: (int) matrix rank
+
+    """
+    n, m = len(matrix), len(matrix[0])
+    max_rank = n if n < m else m
+
+    for row in matrix:
+        zeros = any([m != 0 for m in row])
+        if zeros:
+            min_rank = 1
+            break
+        else:
+            return 0
+
+    square_matrix = return_cropped_square_matrix(matrix)
+
+
