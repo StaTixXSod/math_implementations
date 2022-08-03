@@ -1,4 +1,6 @@
 from typing import List, Optional, Tuple
+from linalg.solving_equations.gaussian_method.gaussian_method_functions import forward_pass
+
 
 matrix_shape = List[List[float]]
 vector_shape = List[float]
@@ -83,7 +85,8 @@ def minor(A: matrix_shape, i: int, j: int) -> float:
     Info:
     -----
     The minor of matrix A, is the determinant of the same matrix except specified "i" row and "j" column indices. 
-    We simply get rid of the values of the specified row and column, and then calculate the determinant of this matrix M.
+    We simply get rid of the values of the specified row and column,
+    and then calculate the determinant of this matrix M.
 
     --------
     Example:
@@ -174,7 +177,7 @@ def det(A: matrix_shape) -> float:
     * Normal method
 
     The determinant is equal to the sum of the products of the elements of only one row
-    by it's minor value. For example we can use only first row of matrix and calculate
+    by its minor value. For example, we can use only first row of matrix and calculate
     matrix product of each row value with its minor value. Then sum it all together changing 
     the signs in the right places.
 
@@ -244,7 +247,7 @@ def inverse(A: matrix_shape) -> matrix_shape:
     Steps:
     ------
     1. Find the determinant of matrix A.
-    If | A | = 0: the inverse matrix doesn't exists, because we can't invert the process.
+    If | A | = 0: the inverse matrix doesn't exist, because we can't invert the process.
 
     2. Find the Minor matrix
 
@@ -329,10 +332,10 @@ def split_by_vectors(matrix: matrix_shape) -> Tuple[matrix_shape, vector_shape]:
 def return_cropped_square_matrix(matrix: matrix_shape):
     n, m = len(matrix), len(matrix[0])
     if n < m:
-        trm = transpose(matrix)[:-1]
+        trm = transpose(matrix)[:n]
         return transpose(trm)
     else:
-        return matrix[:-1]
+        return matrix[:m]
 
 
 def matrix_rank(matrix: matrix_shape) -> int:
@@ -342,18 +345,19 @@ def matrix_rank(matrix: matrix_shape) -> int:
     Info:
     -----
     The matrix rank, roughly speaking, is the count of independent vectors.
-    The matrix rank can't be greater min row value or column value. So if
+    The matrix rank can't be greater the number of rows or columns (whichever is less). So if
     the matrix shape is (4, 5), the rank can't be greater 4.
 
     If matrix consists of zeros, the rank of this matrix is 0. Also, if vectors
     of this matrix are dependent or collinear, the rank of matrix decreases by the value
     of dependent vectors.
 
-    Steps:
-    ------
-    1. Define max rank: N if N < M, else M
-    2. Define min rank: If the matrix has only zeros values -> min rank is 0, else min rank is 1
-    3.
+    Gaussian method:
+    ----------------
+    Matrix rank can be found using gaussian elimination. To find matrix rank we should find the triangular matrix.
+    If all values placed on diagonal is non-zero, then the rank is full and equal to the number of rows.
+    But we may have zeros on diagonal in some rows. And the rank of the matrix is reduced by the number
+    of rows in which there are zeros in place of the diagonal.
 
     Args:
         matrix: the matrix
@@ -361,17 +365,15 @@ def matrix_rank(matrix: matrix_shape) -> int:
     Returns: (int) matrix rank
 
     """
-    n, m = len(matrix), len(matrix[0])
-    max_rank = n if n < m else m
-
-    for row in matrix:
-        zeros = any([m != 0 for m in row])
-        if zeros:
-            min_rank = 1
-            break
-        else:
-            return 0
-
     square_matrix = return_cropped_square_matrix(matrix)
+    triangular_matrix = forward_pass(square_matrix)
 
+    n = len(triangular_matrix)
+    rank = 0
+    for i in range(n):
+        if triangular_matrix[i][i] != 0:
+            rank += 1
+        else:
+            return rank
 
+    return rank
