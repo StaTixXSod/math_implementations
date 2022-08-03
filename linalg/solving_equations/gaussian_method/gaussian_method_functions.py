@@ -1,12 +1,28 @@
-def is_solvable(matrix) -> str:
+import os
+import sys
+sys.path.append(os.getcwd())
+
+from typing import List
+from linalg import functions
+
+
+class EquationError(Exception):
+    """Can't solve equation"""
+
+
+matrix_shape = List[List[float]]
+vector_shape = List[float]
+
+
+def is_solvable(matrix: matrix_shape) -> str:
     """
     To find, if system has solutions or not, usually use determinant.
     But here, due of using Gaussian method it can be calculated with this method:
 
-    - if in any row, ALL values is equals to 0, then the system either has INF solutions, or has not solutions at all
-    - so if all values in row equals to 0 and corresponding answer is equal to 0 too -> then the system has "INFINITE" solutions
-    - otherwise if corresponding answer not equals to 0 -> then the system HAS NOT solutions
-    - Else we have 1 solution
+    - if in any row, ALL values is equals to 0, then the system either has INF solutions, or has no solutions at all
+    - so if all values in row equals to 0 and corresponding answer is equal to 0 too -> then the system has
+    "INFINITE" solutions - otherwise if corresponding answer not equals to 0 -> then the system HAS NO solutions -
+    Else we have 1 solution
 
     Args:
         matrix (list of lists): Triangular matrix, calculated in the previous step
@@ -54,42 +70,43 @@ def is_solvable(matrix) -> str:
     """
     for row in matrix:
         a, b = row[:-1], row[-1]
-        if all(round(v, 2)==0 for v in a):
+        if all(round(v, 2) == 0 for v in a):
             if b == 0:
                 return "INF"
             else:
                 return "NO"
-    
+
     return "YES"
 
-def sort_matrix(matrix: list, method):
-    """Sort matrix by first element in rows"""
-    if method == "descending":
-        return sorted(matrix, key=lambda x: x[0], reverse=True)
-    else:
-        return sorted(matrix, key=lambda x: x[0])
 
-def combine_matrices(X: list, y: list):
+def sort_matrix(matrix: matrix_shape, ascending: bool = False) -> matrix_shape:
+    """Sort matrix by first element in rows"""
+    if ascending:
+        return sorted(matrix, key=lambda x: x[0])
+    else:
+        return sorted(matrix, key=lambda x: x[0], reverse=True)
+
+
+def combine_matrices(X: matrix_shape, y: vector_shape) -> matrix_shape:
     """Return full matrix"""
     matrix = []
-    
+
     for X_row, y_num in zip(X, y):
         full_row = [i for i in X_row]
         full_row.append(y_num)
         matrix.append(full_row)
-    
+
     return matrix
 
-def forward_pass(X: list, y: list):
+
+def forward_pass(X: matrix_shape) -> matrix_shape:
     """
-    Forward pass is the method, that allows to transform original matrix to it's triangular form.
+    Forward pass is the method, that allows to transform original matrix to its triangular form.
 
     Args:
-        X (list): Original system matrix
-        y (list): Answer vector
-    
+        X (matrix_shape): Original system matrix
     Returns:
-        list of lists: Triangular matrix
+        matrix_shape: Triangular matrix
 
     -------------------------------------
 
@@ -99,7 +116,7 @@ def forward_pass(X: list, y: list):
     that will be further transformed into a triangular matrix
 
     2. Sort rows in descending order by first element in row to make
-    largest coefficients be on the first place
+    the largest coefficients be on the first place
 
     3. For each row (step) proceed function 'forward_step'
 
@@ -113,8 +130,7 @@ def forward_pass(X: list, y: list):
 
     0  0  x3 | b
     """
-    triangular_matrix = combine_matrices(X, y)
-    triangular_matrix = sort_matrix(triangular_matrix, "descending")
+    triangular_matrix = sort_matrix(X)
 
     n = len(X) if len(X) < len(X[0]) else len(X[0])
 
@@ -123,25 +139,27 @@ def forward_pass(X: list, y: list):
 
     return triangular_matrix
 
-def forward_step(tr_m: list, step: int):
+
+def forward_step(tr_m: matrix_shape, step: int) -> matrix_shape:
     """
-    This is one step from forward pass function. Here function nullifies first coefficient element of a certain row/column
+    This is one step from forward pass function.
+    Here function nullifies first coefficient element of a certain row/column
     and based on that multiplicative value recalculate the rest values from that row. 
 
     Args:
-        tr_m (list of lists): Matrix, that transforms to triangular here
-        step (int): Current step (row number)
+        `tr_m` (matrix_shape): Triangular matrix. Matrix, that transforms to triangular here
+        `step` (int): Current step (row number)
 
     ---------------------
     Steps:
     ---------------------
-    1. Find the main value (coef), which will be multiplied and subtracted for nullification value below
+    1. Find the main value (coefficient), which will be multiplied and subtracted for nullification value below
 
     2. If that main value is 0, then do nothing and continue step due that you can't divide on 0
 
-    3. For loop from step + 1 to n:
-        - finding the value to nullify and it's multiplication (mult) value
-        - init for loop over column indices
+    3. `For` loop from step + 1 to n:
+        - find the value to nullify and its multiplication (mult) value
+        - initialize `for` loop over column indices
         - change the rest values in row by subtracting from certain value specific number (value above * mult value)
 
     ---------------------
@@ -158,19 +176,19 @@ def forward_step(tr_m: list, step: int):
 
     0  x2 x3 | b
 
-    In addition x2 and x3 from 2nd equation substracted by value above, multiplied by a coefficient
+    In addition, x2 and x3 from 2nd equation subtracted by value above, multiplied by a coefficient
 
     """
-    n = len(tr_m) # Number of rows
-    m = len(tr_m[0]) # Number of columns
-    coef = tr_m[step][step] # Current coefficient
+    n = len(tr_m)  # Number of rows
+    m = len(tr_m[0])  # Number of columns
+    coefficient = tr_m[step][step]  # Current coefficient
 
-    if coef == 0: # We can't divide on 0, so continue here
+    if coefficient == 0:  # We can't divide on 0, so continue here
         return tr_m
 
-    for row_idx in range(step+1, n):
+    for row_idx in range(step + 1, n):
         nullify_val = tr_m[row_idx][step]
-        mult = -nullify_val / coef
+        mult = -nullify_val / coefficient
 
         for col_idx in range(m):
             num_above = tr_m[step][col_idx]
@@ -180,54 +198,56 @@ def forward_step(tr_m: list, step: int):
 
     return tr_m
 
-def backward_pass(matrix) -> list:
+
+def backward_pass(matrix: matrix_shape) -> vector_shape:
     """
     This backward pass function finds the coefficients of equation, using triangular matrix.
 
     Args:
-        matrix (list of lists): Triangular matrix
+        matrix (matrix_shape): Triangular matrix
 
     Returns:
-        list: Coefficients to solve equation
-    
+        vector_shape: unknown variables to solve equation
+
     ------------------------------------------------
     Steps:
     -------
-    1. Create coefficients list to have access to specific coefficient by it's index in future
+    1. Create coefficients list to have access to specific coefficient by its index in future
 
-    2. Initialize 'for' loop in reverse order from 'number of rows' to 0 due to the fact, 
-    that we 'unsqueeze' our equation from bottom to top
+    2. Initialize `for` loop in reverse order from 'number of rows' to 0 due to the fact,
+    that we "unsqueeze" our equation from bottom to top
 
     3. Define next values:
-        - free member: it's the values from last column
+        - b: these are the values from the last column called a "constant"
         - known variables: it's the sum of (coefficient * parameter), that non zero
         - answer: when we know some coefficients, we can find some variables and put that values to the right
-        - value: it's the coef of unknown variable
+        - value: it's the coefficient of unknown variable
         - Coefficient is the answer / value
     """
-    n = len(matrix) # if len(matrix) < len(matrix[0]) else len(matrix[0])
+    n = len(matrix)
+    coefficients: vector_shape = [0 for _ in range(n)]
 
-    coefficients = [0 for i in range(n)]
-
-    for row_idx in range(n-1, -1, -1):
-        free_member = matrix[row_idx][-1]
-        known_variables = sum([coefficients[i]*matrix[row_idx][i] for i in range(n)])
-        answer = free_member - known_variables
+    for row_idx in range(n - 1, -1, -1):
+        b = matrix[row_idx][-1]
+        known_variables = sum([coefficients[i] * matrix[row_idx][i] for i in range(n)])
+        answer = b - known_variables
         value = matrix[row_idx][row_idx]
         coefficients[row_idx] = answer / value
 
     return coefficients
 
-def gaussian_solve_equation(X: list, y: list, show_triangular: bool = False) -> list:
+
+def gaussian_solve_equation(X: matrix_shape, y: vector_shape, show_triangular: bool = False) -> vector_shape:
     """
     This function returns a coefficients of the given matrix using Gaussian method.
 
     Args:
-        X (list of lists): Original system matrix
-        y (list): Answer vector
-    
+        X (matrix_shape): Original system matrix
+        y (vector_shape): Constant vector
+        show_triangular (bool): If `True`, then show the matrix
+
     Returns:
-        list: Coefficients to solve equation
+        vector_shape: Coefficients to solve equation
 
     ------------------------------------
     Steps:
@@ -239,20 +259,17 @@ def gaussian_solve_equation(X: list, y: list, show_triangular: bool = False) -> 
     3. If 'YES', proceed backward pass
     """
     if len(X) < len(X[0]):
-        print("INF")
-        return None
+        raise EquationError("The equation has infinite solutions...")
 
-    triangular_matrix = forward_pass(X, y)
+    matrix = combine_matrices(X, y)
+    triangular_matrix = forward_pass(matrix)
     solvable = is_solvable(triangular_matrix)
 
     if show_triangular:
-        for line in triangular_matrix:
-            print('  '.join(map(str, line)))
+        functions.print_matrix(triangular_matrix, title="Triangular matrix", use_round=4)
 
-    if solvable == "YES":
-        print(solvable)
-        return backward_pass(triangular_matrix)
+    if solvable != "YES":
+        raise EquationError(f"The equation has {solvable} solutions...")
 
     else:
-        print(solvable)
-        return None
+        return backward_pass(triangular_matrix)

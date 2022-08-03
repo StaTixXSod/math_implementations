@@ -18,11 +18,22 @@ for i in range(n):
 7 8 9 1
 9 1 3 2
 
-YES
 0.2608695652173913 0.04347826086956526 -0.1304347826086957
+
+2 3
+1 3 4 4
+2 1 4 5
+
+gaussian_method_functions.EquationError: The equation has infinite solutions...
+
+3 3
+1 3 2 7
+2 6 4 8
+1 4 3 1
+
+gaussian_method_functions.EquationError: The equation has NO solutions...
 """
 
-# Coefficients: 
 y_hat = gaussian_solve_equation(X, y)
 
 if y_hat is not None:
