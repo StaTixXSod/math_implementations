@@ -57,14 +57,15 @@ def chi_squared_distance(observed: np.ndarray, expected: np.ndarray = None) -> f
     return ((observed - expected) ** 2 / expected).sum()
 
 
-def chi2_test(observed: np.ndarray, expected: np.ndarray = None) -> Tuple[float, int]:
+def chi2_test(observed: np.ndarray, expected: np.ndarray = None) -> Tuple[float, float]:
     """
-
+    Perform Chi Squared test for observed data frequencies. If expected is None, it'll be the mean of observed data
     Returns:
-        object:
+        Chi statistic (float)
+        P value (float)
     """
     chi_statistic = chi_squared_distance(observed, expected)
-    p_value = p = chi2.sf(chi_statistic, len(observed) - 1)
+    p_value = chi2.sf(chi_statistic, len(observed) - 1)
     return chi_statistic, p_value
 
 
