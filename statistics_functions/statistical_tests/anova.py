@@ -1,20 +1,24 @@
-import sys, os
+import os
+import sys
+
 sys.path.append(os.getcwd())
 from typing import Tuple, NamedTuple
 
-import numpy as np
 import pandas as pd
 from scipy.stats import f
 from statistics_functions.functions import *
+
 
 class OneWayAnovaStatistics(NamedTuple):
     statistic: float
     pvalue: float
 
+
 class GroupStatistic(NamedTuple):
     sum_sq: float or list
     df: int or list
     ms: float or list
+
 
 def one_way_anova(*args: list) -> OneWayAnovaStatistics:
     """
@@ -73,8 +77,9 @@ def one_way_anova(*args: list) -> OneWayAnovaStatistics:
 
     f_val = ssb_div / ssw_div
     p_val = f.sf(f_val, df_ssb, df_ssw)
-    
+
     return OneWayAnovaStatistics(f_val, p_val)
+
 
 def TSS(vector: list) -> float:
     """
@@ -117,7 +122,8 @@ def TSS(vector: list) -> float:
             The degrees of freedom
     """
     Y = np.mean(vector)
-    return np.sum([(yi - Y)**2 for yi in vector])
+    return sum([(yi - Y) ** 2 for yi in vector])
+
 
 def SSB(groups: list) -> Tuple[float, int]:
     """Return the sum of squares between groups and ddof
@@ -155,8 +161,9 @@ def SSB(groups: list) -> Tuple[float, int]:
     """
     X = mean(flatten(groups))
     df = len(groups) - 1
-    ssb = sum([len(group) * (mean(group) - X)**2 for group in groups])
-    return (ssb, df)
+    ssb = sum([len(group) * (mean(group) - X) ** 2 for group in groups])
+    return ssb, df
+
 
 def SSW(groups: list) -> Tuple[float, int]:
     """Return the sum of squares within groups and ddof
@@ -165,8 +172,8 @@ def SSW(groups: list) -> Tuple[float, int]:
     -----
     The SSW (sum of squares within groups) shows, how much 
     an items in the groups deviates from its mean in group.
-    If SSW is a small value, then the data within the groups doesn't deviates much
-    from it's mean. Otherwise there is big variance in the groups.
+    If SSW is a small value, then the data within the groups doesn't deviate much
+    from its mean. Otherwise, there is big variance in the groups.
 
     If SSW is small and SSB is large, there is a chance to get rid of the H0 hypothesis.
 
@@ -193,9 +200,10 @@ def SSW(groups: list) -> Tuple[float, int]:
         df: int
             The degrees of freedom
     """
-    df = sum([len(group)-1 for group in groups])
+    df = sum([len(group) - 1 for group in groups])
     ssw = sum([TSS(group) for group in groups])
-    return (ssw, df)
+    return ssw, df
+
 
 def two_way_anova(data: pd.DataFrame, features: list, target: str) -> pd.DataFrame:
     """Return two-way ANOVA result
@@ -222,6 +230,7 @@ def two_way_anova(data: pd.DataFrame, features: list, target: str) -> pd.DataFra
     Args:
         data (pd.DataFrame): DataFrame with data to compare
         features (list): the features to compare
+        target: the target feature we want to explore
 
     Returns:
         Pandas DataFrame: Statistics about the data
@@ -243,11 +252,12 @@ def two_way_anova(data: pd.DataFrame, features: list, target: str) -> pd.DataFra
 
     # 6. Calculate P values
     p_values = calculate_P_values(f_values, ssb, ssw)
-    
+
     # 7. Group it all together
     statistic = form_statistic(ssb, ssw, interactions, f_values, p_values, features)
-    
+
     return statistic
+
 
 def SSB_Factorial(data: pd.DataFrame, features: list, target: str) -> GroupStatistic:
     """Return sum of squares, degrees of freedom and mean sum of squares between groups
@@ -292,12 +302,12 @@ def SSB_Factorial(data: pd.DataFrame, features: list, target: str) -> GroupStati
     features_sum_sq = []
     features_df = []
     features_ms = []
-    GM = np.mean(data[target].values)
-    
+    GM = np.mean(data[target].values)  # Grand Mean
+
     # For each feature...
     for feature in features:
-        feature_means = [] # add up the means for each group of feature
-        feature_group = data.groupby(feature) # group by feature
+        feature_means = []  # add up the means for each group of feature
+        feature_group = data.groupby(feature)  # group by feature
         # For each group with feature...
         for _, feature_df in feature_group:
             values = feature_df[target]
@@ -305,13 +315,14 @@ def SSB_Factorial(data: pd.DataFrame, features: list, target: str) -> GroupStati
             feature_mean = np.mean(values)
             feature_means.append((n, feature_mean))
 
-        sum_sq = np.sum([n * (fm - GM)**2 for n, fm in feature_means])
+        sum_sq = np.sum([n * (fm - GM) ** 2 for n, fm in feature_means])
         df = data[feature].nunique() - 1
         features_sum_sq.append(sum_sq)
         features_df.append(df)
         features_ms.append(sum_sq / df)
-        
+
     return GroupStatistic(features_sum_sq, features_df, features_ms)
+
 
 def SSW_Factorial(data: pd.DataFrame, features: list, target: str) -> GroupStatistic:
     """Return sum of squares, degrees of freedom and mean sum of squares within groups
@@ -360,13 +371,14 @@ def SSW_Factorial(data: pd.DataFrame, features: list, target: str) -> GroupStati
     for _, groupped_df in groupped:
         values = groupped_df[target]
         group_mean = np.mean(values)
-        ss = np.sum([(vi - group_mean)**2 for vi in values])
+        ss = np.sum([(vi - group_mean) ** 2 for vi in values])
         ss_resid_list.append(ss)
         df_resid += groupped_df.shape[0] - 1
     ss_resid = np.sum(ss_resid_list)
     ms_resid = ss_resid / df_resid
-    
+
     return GroupStatistic(ss_resid, df_resid, ms_resid)
+
 
 def interaction(total: float, ssb: GroupStatistic, ssw: GroupStatistic) -> GroupStatistic:
     """Return feature interaction statistic
@@ -411,6 +423,7 @@ def interaction(total: float, ssb: GroupStatistic, ssw: GroupStatistic) -> Group
     ms_interaction = ss / df
     return GroupStatistic(ss, df, ms_interaction)
 
+
 def calculate_F_values(ssb: GroupStatistic, ssw: GroupStatistic, interactions: GroupStatistic) -> list:
     """Calculate the F values
 
@@ -445,6 +458,7 @@ def calculate_F_values(ssb: GroupStatistic, ssw: GroupStatistic, interactions: G
     f_features = [ssb_ms_item / ssw.ms for ssb_ms_item in ssb.ms]
     f_interaction = interactions.ms / ssw.ms
     return [*f_features, f_interaction]
+
 
 def calculate_P_values(f_values: list, ssb: GroupStatistic, ssw: GroupStatistic) -> list:
     """Calculate the P value for each feature and interaction F values
@@ -483,14 +497,14 @@ def calculate_P_values(f_values: list, ssb: GroupStatistic, ssw: GroupStatistic)
     """
     return [f.sf(f_value, ssb.df, ssw.df)[-1] for f_value in f_values]
 
+
 def form_statistic(
-        ssb: GroupStatistic, 
-        ssw: GroupStatistic, 
-        interactions: GroupStatistic, 
+        ssb: GroupStatistic,
+        ssw: GroupStatistic,
+        interactions: GroupStatistic,
         f_values: list,
         p_values: list,
         features: list) -> pd.DataFrame:
-
     statistic = {"feature": [], "sum_sq": [], "df": [], "F": [], "Pvalue": []}
 
     # For each feature fill in corresponded values...
@@ -513,6 +527,6 @@ def form_statistic(
     for f_val, p_val in zip(f_values, p_values):
         statistic["F"].append(f_val)
         statistic["Pvalue"].append(p_val)
-    
+
     statistic = pd.DataFrame.from_dict(statistic, orient='index').T
     return statistic
