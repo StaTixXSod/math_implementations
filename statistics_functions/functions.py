@@ -2,6 +2,7 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def mean(vector: list, ddof: int = None) -> float:
     """Return the mean value of the vector.
 
@@ -26,13 +27,14 @@ def mean(vector: list, ddof: int = None) -> float:
         float: the mean value
     """
     m = 0
-    if ddof == None:
+    if ddof is None:
         no = len(vector)
     else:
         no = ddof
     for item in vector:
         m += item
     return m / no
+
 
 def var(vector: list, ddof: int = None) -> float:
     """Return variance of the vector
@@ -63,8 +65,9 @@ def var(vector: list, ddof: int = None) -> float:
 
     var = []
     for x in vector:
-        var.append((x - E)**2)
+        var.append((x - E) ** 2)
     return mean(var, ddof)
+
 
 def std(vector: list, ddof: int = None) -> float:
     """Return Standard Deviation of vector
@@ -89,7 +92,8 @@ def std(vector: list, ddof: int = None) -> float:
     Returns:
         float: standart deviation value
     """
-    return var(vector, ddof=ddof)**0.5
+    return var(vector, ddof=ddof) ** 0.5
+
 
 def standard_error(vector: list) -> float:
     """Return the standard error of the vector
@@ -109,22 +113,25 @@ def standard_error(vector: list) -> float:
     Returns:
         float: Standard error value
     """
-    sdev = std(vector, len(vector)-1)
-    sdist = len(vector)**0.5
+    sdev = std(vector, len(vector) - 1)
+    sdist = len(vector) ** 0.5
     return sdev / sdist
 
+
 def t_value(popmean: float, samplemean: float, sd: float, no: int) -> float:
-    se = sd / no**0.5
+    se = sd / no ** 0.5
     z = (popmean - samplemean) / se
     return z
 
-def paired_ttest_simp(m1: float, m2: float, sd1: float, sd2: float, n1: int, n2: int) -> float:
-    se1 = sd1**2 / n1
-    se2 = sd2**2 / n2
 
-    t = (m1 - m2) / (se1 + se2)**0.5
+def paired_ttest_simp(m1: float, m2: float, sd1: float, sd2: float, n1: int, n2: int) -> float:
+    se1 = sd1 ** 2 / n1
+    se2 = sd2 ** 2 / n2
+
+    t = (m1 - m2) / (se1 + se2) ** 0.5
 
     return t
+
 
 def percentile(v: list, percent: float) -> float:
     """Return the percentile value of an array
@@ -155,9 +162,11 @@ def percentile(v: list, percent: float) -> float:
         h = v[c]
         return (l + h) / 2
 
+
 def median(vector: list) -> float:
     """Return the median value of list"""
     return percentile(vector, 0.5)
+
 
 def qqplot(vector: list):
     """Plot Q-Q graph
@@ -165,7 +174,7 @@ def qqplot(vector: list):
     INFO:
     -----
     The Q-Q plot shows the distribution of a given vector,
-    relative to the standard normal distriburion. The main reason to use Q-Q plot is to find out
+    relative to the standard normal distribution. The main reason to use Q-Q plot is to find out
     if the sample data has a normal distribution, because if we know the data is normally distributed, 
     we can assume some theories and run some tests.
 
@@ -173,12 +182,12 @@ def qqplot(vector: list):
 
     Interpretation:
     ---------------
-    1. While the points of sample quantiles lies on the line, this means, that the
+    1. While the points of sample quantiles lies on the line, this means the
     sample points fits to the standard normal distribution.
     2. If the points are above the line, this means we are getting too high results,
     than we have to get.
-    3. Otherwise, if the points are below the line, this means we are getting too low results,
-    than we have to get, if we our sample data have normal distribution.
+    3. Otherwise, if the points located below the line, this means we are getting too low results,
+    than we have to get, if our sample data is a normally distributed.
      
     -----
     Args:
@@ -196,20 +205,23 @@ def qqplot(vector: list):
     plt.style.use("ggplot")
     plt.scatter(x, y, lw=2, label="Diff of a given vector from normal distribution", c='b')
     plt.plot(x, x, label="Normal distribution", c='r')
-    plt.xlabel("Theoretical Quatiles")
-    plt.ylabel("Sample Quatiles")
+    plt.xlabel("Theoretical Quantiles")
+    plt.ylabel("Sample Quantiles")
     plt.legend()
     plt.title("Q-Q plot")
     plt.show()
+
 
 def flatten(v: list) -> list:
     """Return flatten list"""
     return [i for j in v for i in j]
 
+
 def paired_diff(a: list, b: list) -> list:
     """Return a list with a pairwise difference of elements"""
     assert len(a) == len(b)
     return [ai - bi for ai, bi in zip(a, b)]
+
 
 def covariation(x: list, y: list) -> float:
     """Return covariation value
@@ -262,10 +274,11 @@ def covariation(x: list, y: list) -> float:
     assert len(x) == len(y)
     X, Y = mean(x), mean(y)
     cov = [(xi - X) * (yi - Y) for xi, yi in zip(x, y)]
-    cov_mean = mean(cov, ddof=len(x)-1)
+    cov_mean = mean(cov, ddof=len(x) - 1)
     return cov_mean
 
-def correlation(x: list, y: list, formula: str="1") -> float:
+
+def correlation(x: list, y: list, formula: str = "1") -> float:
     """Return Pearson correlation coefficient
 
     Info:
@@ -312,26 +325,28 @@ def correlation(x: list, y: list, formula: str="1") -> float:
     """
     assert len(x) == len(y)
     X, Y = mean(x), mean(y)
-    
+
     if formula == "1":
         xy = mean(paired_prod(x, y))
         num = xy - X * Y
-        x_var = mean(squared(x)) - mean(x)**2
-        y_var = mean(squared(y)) - mean(y)**2
-        den = (x_var * y_var)**0.5
+        x_var = mean(squared(x)) - mean(x) ** 2
+        y_var = mean(squared(y)) - mean(y) ** 2
+        den = (x_var * y_var) ** 0.5
         return num / den
-    
+
     elif formula == "2":
         cov = sum([(xi - X) * (yi - Y) for xi, yi in zip(x, y)])
-        xvar = sum([(xi - X)**2 for xi in x])
-        yvar = sum([(yi - Y)**2 for yi in y])
-        sdev = (xvar * yvar)**0.5
+        xvar = sum([(xi - X) ** 2 for xi in x])
+        yvar = sum([(yi - Y) ** 2 for yi in y])
+        sdev = (xvar * yvar) ** 0.5
         return cov / sdev
+
 
 def paired_prod(x: list, y: list) -> list:
     """Return a list of pairwise multiplications"""
-    return [xi*yi for xi, yi in zip(x, y)]
-    
+    return [xi * yi for xi, yi in zip(x, y)]
+
+
 def squared(a: list) -> list:
     """Return the same list with squared values"""
-    return [ai**2 for ai in a]
+    return [ai ** 2 for ai in a]
