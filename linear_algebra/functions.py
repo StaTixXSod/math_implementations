@@ -1,5 +1,5 @@
 from typing import List, Optional, Tuple
-from linalg.solving_equations.gaussian_method.gaussian_method_functions import forward_pass
+from linear_algebra.solving_equations.gaussian_method.gaussian_method_functions import forward_pass
 
 
 matrix_shape = List[List[float]]

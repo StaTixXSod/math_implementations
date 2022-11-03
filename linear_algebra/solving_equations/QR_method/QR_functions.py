@@ -1,6 +1,6 @@
 import os, sys
 sys.path.append(os.getcwd())
-from linalg.functions import *
+from linear_algebra.functions import *
 from typing import List, Tuple
 
 matrix_shape = List[List[float]]

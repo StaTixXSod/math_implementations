@@ -2,7 +2,7 @@ import os
 import sys
 
 sys.path.append(os.getcwd())
-from statistics_functions.functions import *
+from statistics.functions import *
 from scipy.stats import t
 
 def simple_ols(x: list, y: list) -> tuple:

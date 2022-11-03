@@ -223,16 +223,16 @@ def paired_diff(a: list, b: list) -> list:
     return [ai - bi for ai, bi in zip(a, b)]
 
 
-def covariation(x: list, y: list) -> float:
-    """Return covariation value
+def covariance(x: list, y: list) -> float:
+    """Return covariance value
 
     Info:
     -----
     It is like the VARiance, but for 2 arrays, that shows the value of relationship between two samples of data.
-    If the data has positive relationship, the covariation value will be positive, otherwise negative
+    If the data has positive relationship, the covariance value will be positive, otherwise negative
     (or approximately will be 0). To calculate the relationship between 2 samples, we calculate 
     mean value for X data and Y data. If most samples of data located higher X mean and Y mean AND 
-    lower X mean and Y mean, this mean our data has POSITIVE correlation (covariation), because 
+    lower X mean and Y mean, this mean our data has POSITIVE correlation (covariance), because
     points are located in left lower square and upper right square.
 
     Example:
@@ -269,7 +269,7 @@ def covariation(x: list, y: list) -> float:
         x, y (list): array lists of data to compare
 
     Returns:
-        float: covariation value
+        float: covariance value
     """
     assert len(x) == len(y)
     X, Y = mean(x), mean(y)
@@ -284,7 +284,7 @@ def correlation(x: list, y: list, formula: str = "1") -> float:
     Info:
     -----
     Correlation coefficient, also called Pearson Correlation coefficient 
-    shows the relationship between 2 samples of data. This is the covariation value,
+    shows the relationship between 2 samples of data. This is the covariance value,
     divided by product of std(x) and std(y) to transform the value 
     into range from -1 to 1. 
     This coefficient better to use, when data has linear relationship. If it's not,
@@ -296,7 +296,7 @@ def correlation(x: list, y: list, formula: str = "1") -> float:
 
         where
             r_xy: correlation coefficient
-            cov: covariation value
+            cov: covariance value
     
     * `cov(x, y) = E[(xi - X) * (yi - Y)]`
 

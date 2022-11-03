@@ -1,5 +1,5 @@
 from scipy.stats import chisquare
-from statistics_functions.statistical_tests import pearson_chi_square as chi
+from statistics.statistical_tests import pearson_chi_square as chi
 import numpy as np
 
 

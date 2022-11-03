@@ -2,7 +2,7 @@ import os
 import sys
 
 sys.path.append(os.getcwd())
-from linalg.functions import matrix_rank
+from linear_algebra.functions import matrix_rank
 import numpy as np
 
 np.random.seed(42)

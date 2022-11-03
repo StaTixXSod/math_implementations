@@ -6,7 +6,7 @@ from typing import Tuple, NamedTuple
 
 import pandas as pd
 from scipy.stats import f
-from statistics_functions.functions import *
+from statistics.functions import *
 
 
 class OneWayAnovaStatistics(NamedTuple):

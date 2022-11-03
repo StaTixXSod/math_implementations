@@ -6,7 +6,7 @@ import statsmodels.api as sm
 from statsmodels.formula.api import ols
 
 import pandas as pd
-from statistics_functions.statistical_tests.anova import one_way_anova, two_way_anova
+from statistics.statistical_tests.anova import one_way_anova, two_way_anova
 from scipy.stats import f_oneway
 
 l1 = [3, 1, 2]

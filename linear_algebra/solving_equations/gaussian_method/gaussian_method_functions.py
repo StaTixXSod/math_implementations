@@ -3,7 +3,7 @@ import sys
 sys.path.append(os.getcwd())
 
 from typing import List
-from linalg import functions
+from linear_algebra import functions
 
 
 class EquationError(Exception):

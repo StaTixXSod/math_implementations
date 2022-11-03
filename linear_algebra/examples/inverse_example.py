@@ -2,7 +2,7 @@ import os
 import sys
 sys.path.append(os.getcwd())
 
-from linalg.functions import *
+from linear_algebra.functions import *
 import numpy as np
 np.random.seed(42)
 

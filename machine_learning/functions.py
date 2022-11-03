@@ -2,7 +2,7 @@ import os
 import sys
 
 sys.path.append(os.getcwd())
-from statistics_functions.functions import *
+from statistics.functions import *
 
 def make_prediction(x: list, intercept: float, slope: float) -> list:
     """Makes prediction for each "x" value"""
