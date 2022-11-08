@@ -1,12 +1,11 @@
 import os
 import sys
-
 sys.path.append(os.getcwd())
-from typing import Tuple, NamedTuple
 
-import pandas as pd
+from typing import Tuple, NamedTuple
 from scipy.stats import f
-from statistics.functions import *
+from statistical_functions.functions import *
+import pandas as pd
 
 
 class OneWayAnovaStatistics(NamedTuple):
@@ -42,14 +41,14 @@ def one_way_anova(*args: list) -> OneWayAnovaStatistics:
     Interpretation:
     ---------------
     Lets assume, we repeating our experiment many times when H0 is TRUE.
-    It means, that all our sample means ARE EQUAL. It's like we getting 3 samples from 1 population.
+    It means, that all our sample means ARE EQUAL. It's like we're getting 3 samples from 1 population.
     So, our SSB tends to 0, because we assume, if we have H0, there is no difference between sample means.
     SSW is the total value of difference within the group, it's like the correction to our computation.
     This means, that in most cases, if H0 is TRUE, the F value will be very small.
 
-    Here we have F distribution. This distribution not like the normal distribution, 
-    it has asymmetry, skewed to the left (positive skew) (Sometimes max value is close to 0). If we get large F value, we may reject the null hypothesis.
-    To reject the null hypothesis, we calculate the p-value.
+    Here we have F distribution. This distribution not like the normal distribution, it has asymmetry, skewed to the
+    left (positive skew) (Sometimes max value is close to 0). If we get large F value, we may reject the null
+    hypothesis. To reject the null hypothesis, we calculate the p-value.
 
     Steps:
     ------
@@ -134,8 +133,8 @@ def SSB(groups: list) -> Tuple[float, int]:
     the mean of group (m) deviates from its general mean (X).
 
     If there is a big difference between mean in group and the general mean, 
-    we can assume, that there is an difference between groups and we 
-    may reject the null hypothesis. Otherwise if SSB is a small value, then we
+    we can assume, that there is a difference between groups, so we
+    may reject the null hypothesis. Otherwise, if SSB is a small value, then we
     may assume, that there is not much difference between mean in groups. 
 
     Formula:
@@ -211,7 +210,7 @@ def two_way_anova(data: pd.DataFrame, features: list, target: str) -> pd.DataFra
     Info:
     -----
     Two-way ANOVA is almost the same as one-way ANOVA. The difference
-    here is, that for two-way ANOVA we trying to compare all features data with all groups 
+    here is, that for two-way ANOVA we're trying to compare all features data with all groups
     in all features data. This allows to find out, what feature has the most impact on the data.
 
     The process pretty the same, as in the One-way ANOVA: find SSB, SSW and calculate the ratio between this 2 values.

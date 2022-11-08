@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 np.random.seed(42)
 
-from statistics.statistical_tests.student_test import *
+from statistical_functions.statistical_tests.student_test import *
 from scipy.stats import ttest_rel, ttest_ind, ttest_1samp
 
 v1 = np.random.standard_t(100, 1000)

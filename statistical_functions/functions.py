@@ -348,5 +348,8 @@ def paired_prod(x: list, y: list) -> list:
 
 
 def squared(a: list) -> list:
-    """Return the same list with squared values"""
+    """
+    Return the same list with squared values
+    Formula: [a[i]**2 for i in a]
+    """
     return [ai ** 2 for ai in a]

@@ -3,7 +3,7 @@ import sys
 
 sys.path.append(os.getcwd())
 from typing import Tuple
-from statistics.functions import *
+from statistical_functions.functions import *
 from scipy.stats import t
 
 
