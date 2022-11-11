@@ -34,9 +34,16 @@ def euclidean_distance(p: distance_types, q: distance_types) -> int:
     return d
 
 
-def manhattan_distance(p: distance_types, q: distance_types) -> int:
+def manhattan_distance(p: distance_types, q: distance_types) -> float:
     """
-    Calculate the Manhattan metric between 2 points
+    Calculate the Manhattan metric between 2 points.
+
+    Formula:\n
+    - `Σ| p - q |`\n
+        where:
+            p: coordinates of the first point \n
+            d: coordinates of the second point
+
     Args:
         p: the coordinates of the first point
         q: the coordinates of the second point
@@ -72,11 +79,11 @@ def linear_combination(restore_feature, distance):
     return num / den
 
 
-def restore_data(data: pd.DataFrame,
-                 feature2restore: str,
-                 method: Literal["euclidean", "manhattan", "max"] = "euclidean") -> pd.Series:
+def restore_missing_data(data: pd.DataFrame,
+                         feature2restore: str,
+                         method: Literal["euclidean", "manhattan", "max"] = "euclidean") -> pd.Series:
     """
-    Restore data using distance metric approach.
+    Restore missing data using distance metric approach.
     Args:
         data: (pandas.DataFrame) the data with missing values
         feature2restore: choose the feature with missing values
