@@ -6,9 +6,9 @@ df = pd.DataFrame(
     index=['A1', 'A2', 'A3', 'A'])
 
 print(df)
-euc = restore_data(df, 'P', method="euclidean")
-man = restore_data(df, 'P', method="manhattan")
-mx = restore_data(df, 'P', method="max")
+euc = restore_missing_data(df, 'P', method="euclidean")
+man = restore_missing_data(df, 'P', method="manhattan")
+mx = restore_missing_data(df, 'P', method="max")
 
 print(pd.DataFrame(
     data=[euc, man, mx],
