@@ -1,4 +1,5 @@
-import math
+from typing import Tuple
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -133,13 +134,19 @@ def paired_ttest_simp(m1: float, m2: float, sd1: float, sd2: float, n1: int, n2:
     return t
 
 
-def percentile(v: list, percent: float) -> float:
+def percentile(v: np.ndarray, percent: float) -> float:
     """Return the percentile value of an array
+
+    Info:
+    -----
+    Percentile shows, how many data are below the chosen percent. For example the percentile of 50
+    means, that 50% percent of data are below the returned value (percentile value).
+    `The Q25 is the value means, that 25% of data are below this value`
 
     Note:
     -----
     - Percentile of an array = 0.5 is the median.
-    - Percentile of an array = 1.0 is the CDF (Cummulative Distribution Function).
+    - Percentile of an array = 1.0 is the CDF (Cumulative Distribution Function).
     
     -----
     Args:
@@ -149,23 +156,31 @@ def percentile(v: list, percent: float) -> float:
     Returns:
         float: Percentage value
     """
-    v = sorted(v)
-    k = (len(v) - 1) * percent
+    v = np.sort(v)
+    k = (v.size - 1) * percent
 
-    f = math.floor(k)
-    c = math.ceil(k)
+    f = np.floor(k)
+    c = np.ceil(k)
 
     if f == c:
-        return v[f]
-    else:
-        l = v[f]
-        h = v[c]
-        return (l + h) / 2
+        return v[int(f)]
+
+    d0 = v[int(f)] * (c - k)
+    d1 = v[int(c)] * (k - f)
+    return d0 + d1
 
 
 def median(vector: list) -> float:
     """Return the median value of list"""
     return percentile(vector, 0.5)
+
+
+def get_quantile_info(vector: np.ndarray) -> Tuple[float, float, float]:
+    """Returns Q25, Median and Q75 of data"""
+    q25 = percentile(vector, 0.25)
+    q50 = percentile(vector, 0.50)  # median
+    q75 = percentile(vector, 0.75)
+    return q25, q50, q75
 
 
 def qqplot(vector: list):
@@ -353,3 +368,15 @@ def squared(a: list) -> list:
     Formula: [a[i]**2 for i in a]
     """
     return [ai ** 2 for ai in a]
+
+
+def check_for_symmetry(p, h, s, n):
+    return np.abs(p - h) <= (3 * s) / np.sqrt(n)
+
+
+def check_array_for_symmetry(arr: np.ndarray) -> bool:
+    p = np.mean(arr)  # mean value
+    h = percentile(arr, 0.5)  # median value
+    s = np.std(arr)
+    n = arr.size
+    return check_for_symmetry(p, h, s, n)
