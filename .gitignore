@@ -1,6 +1,7 @@
 __pycache__
 .vs
 .vscode
+.idea
 .DS_Store
 test
 data
