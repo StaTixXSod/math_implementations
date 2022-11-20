@@ -370,11 +370,24 @@ def squared(a: list) -> list:
     return [ai ** 2 for ai in a]
 
 
-def check_for_symmetry(p, h, s, n):
+def check_for_symmetry(p, h, s, n) -> bool:
+    """
+    Check data for symmetry using specified values.
+
+    Args:
+        p: the mean value
+        h: the median
+        s: the standard deviation
+        n: the number of items in array
+
+    Returns:
+        True if the data is symmetrical, otherwise False
+    """
     return np.abs(p - h) <= (3 * s) / np.sqrt(n)
 
 
 def check_array_for_symmetry(arr: np.ndarray) -> bool:
+    """Return True if data is symmetrical, otherwise False"""
     p = np.mean(arr)  # mean value
     h = percentile(arr, 0.5)  # median value
     s = np.std(arr)
