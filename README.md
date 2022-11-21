@@ -1,6 +1,7 @@
 # Math implementations in Python
 Hi! This repository contains implementations of some mathematical topics, that often uses in "Machine Learning" area.
-All implementations are written in Python.
+I am writing it for myself just to get better understanding of some topics, that I'm currently learning.
+All implementations are written in Python. 
 
 For now this repository contains the following topics:
 - Linear algebra
@@ -68,5 +69,18 @@ For now this repository contains the following topics:
 * Residuals
 * Determination coefficient
 * Regression prediction
+#### Preprocessing
+* Min-Max Scaler
+* Standard Scaler
 #### Regression:
 * Linear regression with one feature
+#### Distance metrics:
+* Euclidean metric
+* Manhattan metric
+* Max-metric
+#### Anomaly detection:
+* Anomaly detection using Chauvenet's criterion
+* Anomaly detection using Z Score
+* Outlier detection using Interquartile Range (IQR)
+#### Clustering:
+* K Means Clustering
