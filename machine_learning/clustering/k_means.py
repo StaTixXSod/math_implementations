@@ -56,7 +56,7 @@ class KMeans:
         # Restrict the loop to avoid infinite process
         for i in range(max_iters):
             distances = self._calculate_euclidian_distance(self.data, cluster_center)
-            assigned_classes = self._assign_cluster_idx_to_data(distances)
+            assigned_classes = self._assign_cluster_to_data(distances)
             centroids = self._calculate_centroids(assigned_classes)
 
             # If any value in centroid is nan -> reset
@@ -146,7 +146,7 @@ class KMeans:
 
         return distances
 
-    def _assign_cluster_idx_to_data(self, distances: np.ndarray):
+    def _assign_cluster_to_data(self, distances: np.ndarray):
         """For each row returns the index of cluster, that have the minimal distance"""
         assigned_classes = np.argmin(distances, axis=1)
         return assigned_classes
