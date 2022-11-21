@@ -13,7 +13,7 @@ def euclidean_distance(p: distance_types, q: distance_types) -> int:
     Steps:
     ------
     1. Calculate the difference between points
-    2. Calculate the square for difference to get rid of negative signs
+    2. Calculate the square of difference to get rid of negative signs
     3. Sum it up
     4. Calculate the square root to normalize values
 
