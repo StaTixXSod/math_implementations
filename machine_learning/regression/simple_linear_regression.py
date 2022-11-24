@@ -2,8 +2,9 @@ import os
 import sys
 
 sys.path.append(os.getcwd())
-from statistics.functions import *
+from statistical_functions.functions import *
 from scipy.stats import t
+
 
 def simple_ols(x: list, y: list) -> tuple:
     """Return linear regression coefficients using correlation between two samples
@@ -11,7 +12,7 @@ def simple_ols(x: list, y: list) -> tuple:
     Info:
     -----
     This simple OLS function is used to get coefficient and intercept values using one feature.
-    The functions returns next values: intercept, slope, T value and P value.
+    The function return next values: intercept, slope, T value and P value.
 
     Equation:
     ---------
@@ -82,12 +83,12 @@ def simple_ols(x: list, y: list) -> tuple:
     slope = (sdy / sdx) * rxy
     intercept = mean(y) - slope * mean(x)
 
-    n1, n2 = len(x)-1, len(y)-1
+    n1, n2 = len(x) - 1, len(y) - 1
 
-    se1 = std(x)**2 / n1
-    se2 = std(y)**2 / n2
+    se1 = std(x) ** 2 / n1
+    se2 = std(y) ** 2 / n2
     df = len(x) - 2
-    t_val = slope / (se1 + se2)**0.5
-    p_val = t.sf(abs(t_val), df)*2
+    t_val = slope / (se1 + se2) ** 0.5
+    p_val = t.sf(abs(t_val), df) * 2
 
-    return (intercept, slope, t_val, p_val)
+    return intercept, slope, t_val, p_val

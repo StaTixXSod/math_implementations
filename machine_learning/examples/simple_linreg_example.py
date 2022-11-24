@@ -6,7 +6,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
 
-from linear_regression import simple_ols
+from machine_learning.regression.simple_linear_regression import simple_ols
 from machine_learning.functions import *
 
 
